@@ -112,17 +112,6 @@ export function SiteNavbar() {
               className="flex items-center gap-2.5 flex-none group cursor-pointer"
               onClick={() => setMenuOpen(false)}
             >
-              {/* Crown mark */}
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center flex-none transition-all duration-300 group-hover:scale-105"
-                style={{
-                  background: "linear-gradient(135deg, #e8c26a, #b8922a)",
-                  boxShadow: "0 2px 8px rgba(232,194,106,0.4)",
-                }}
-              >
-                <Crown className="size-4 text-[#101014]" strokeWidth={2.5} aria-hidden="true" />
-              </div>
-
               {/* Word mark */}
               <div className="leading-none">
                 <div
