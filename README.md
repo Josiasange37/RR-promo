@@ -6,7 +6,7 @@ Application web mobile-first de vote en ligne pour l'élection du Roi et de la R
 
 - **Mobile-First & Cinematic UI** : Design haut de gamme avec arrière-plans vidéo cinématiques, effets de flou de verre (liquid glass) et animations fluides.
 - **Vote interactif** : Pop-up d'attribution des votes (100 FCFA/vote) avec calcul en temps réel.
-- **Paiements CamPay** : Intégration MTN MoMo / Orange Money. Mode Bac à sable (sandbox) automatique s'il n'y a pas de clés API.
+- **Paiements CamerPay** : Intégration MTN MoMo / Orange Money via le flux hébergé CamerPay (redirection vers `pay_url` + confirmation par webhook signé HMAC-SHA256).
 - **Suivi & Classement en direct** : Mise à jour automatique des voix toutes les 8 secondes.
 - **Tableau de Bord Admin** : Suivi financier global (total récolté, réussite des transactions, votes par candidat) et possibilité de réinitialiser la base de données.
 
@@ -38,11 +38,10 @@ NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
 
-# Configuration CamPay (Optionnel — active le mode réel si défini)
-CAMPAY_TOKEN=votre_token_campay
-CAMPAY_APP_USERNAME=votre_nom_utilisateur
-CAMPAY_APP_PASSWORD=votre_mot_de_passe
-CAMPAY_MODE=development
+# Configuration CamerPay (obligatoire pour les paiements réels)
+CAMERPAY_TOKEN=votre_token_api
+CAMERPAY_CALLBACK_SECRET=votre_secret_hmac
+CAMERPAY_MODE=production
 ```
 
 ## Panneau Administrateur (URL secrète)
@@ -62,5 +61,5 @@ CAMPAY_MODE=development
 - `app/api/admin/login|dashboard|reset|logout` — API d'authentification et de supervision (server-side only, cookie HttpOnly).
 - `lib/admin-auth.ts` — Sessions HttpOnly, rate limiting, cookies.
 - `lib/db-supabase.ts` — Accès Supabase (candidats, transactions).
-- `lib/campay.ts` — Client d'intégration CamPay Mobile Money et simulation.
+- `lib/camerpay.ts` — Client d'intégration CamerPay (initiation, vérification HMAC, payouts).
 - `components/ui/coverflow-carousel.tsx` — Carousel 3D coverflow optisé pour le défilement automatique et le drag tactile.
