@@ -99,8 +99,9 @@ async function main() {
     console.log(`    URL du panneau : /admin/${env.ADMIN_SLUG || process.env.ADMIN_SLUG || "<ADMIN_SLUG>"}`)
     console.log("──────────────────────────────────────────────")
     console.log(`  Identifiant : ${data.username}`)
-    console.log(`  Mot de passe : ${password}`)
-    console.log("  ⚠ Copiez ce mot de passe maintenant — il ne sera plus jamais affiché.\n")
+    console.log("  ⚠ La connexion se fait UNIQUEMENT avec le code de vérification (authentificateur).")
+    console.log(`    Demandez au propriétaire (accès complet) d'assigner un authentificateur à « ${data.username} »,`)
+    console.log("    puis connectez-vous avec le code à 6 chiffres de l'application.\n")
   }
 
   console.log("Terminé. Utilisez ces identifiants sur la page secrète du panneau admin.")

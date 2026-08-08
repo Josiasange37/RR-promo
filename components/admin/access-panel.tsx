@@ -5,7 +5,6 @@ import {
   ShieldCheck,
   ShieldOff,
   UserCog,
-  KeyRound,
   Loader2,
   CheckCircle,
   QrCode,
@@ -36,8 +35,7 @@ interface EnrollResult {
 
 type Modal =
   | { type: "qr"; admin: AdminUser; data: EnrollResult | null; code: string; busy: boolean; error: string | null }
-  | { type: "password"; name: string; newPassword: string | null; busy: boolean; error: string | null }
-  | { type: "create"; username: string; label: string; created: { username: string; password: string } | null; busy: boolean; error: string | null }
+  | { type: "create"; username: string; label: string; created: { username: string } | null; busy: boolean; error: string | null }
   | null
 
 export default function AccessPanel() {
@@ -107,7 +105,7 @@ export default function AccessPanel() {
   }
 
   const revoke = async (admin: AdminUser) => {
-    if (!confirm(`Désactiver l'authentificateur de « ${admin.username} » ? Il repassera au mot de passe.`)) return
+    if (!confirm(`Désactiver l'authentificateur de « ${admin.username} » ? Ce compte ne pourra plus se connecter tant qu'un nouvel authentificateur ne lui est pas assigné.`)) return
     try {
       const res = await fetch("/api/admin/access/revoke", {
         method: "POST",
@@ -122,28 +120,6 @@ export default function AccessPanel() {
     }
   }
 
-  const resetPassword = (admin: AdminUser) => {
-    if (!confirm(`Réinitialiser le mot de passe de « ${admin.username} » ? Le nouveau mot de passe ne sera affiché qu'une fois.`)) return
-    setModal({ type: "password", name: admin.username, newPassword: null, busy: true, error: null })
-    ;(async () => {
-      try {
-        const res = await fetch("/api/admin/access/password", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ adminId: admin.id }),
-        })
-        const data = await safeJson(res)
-        if (data.success) {
-          setModal({ type: "password", name: admin.username, newPassword: data.newPassword, busy: false, error: null })
-        } else {
-          setModal({ type: "password", name: admin.username, newPassword: null, busy: false, error: data.error ?? "Échec." })
-        }
-      } catch {
-        setModal({ type: "password", name: admin.username, newPassword: null, busy: false, error: "Erreur réseau." })
-      }
-    })()
-  }
-
   const createAdmin = async () => {
     if (!modal || modal.type !== "create" || !modal.username.trim()) return
     setModal({ ...modal, busy: true, error: null })
@@ -155,7 +131,7 @@ export default function AccessPanel() {
       })
       const data = await safeJson(res)
       if (data.success) {
-        setModal({ ...modal, busy: false, created: { username: data.admin.username, password: data.password } })
+        setModal({ ...modal, busy: false, created: { username: data.admin.username } })
         load()
       } else {
         setModal({ ...modal, busy: false, error: data.error ?? "Échec de la création." })
@@ -217,7 +193,7 @@ export default function AccessPanel() {
               <ShieldCheck className="size-5" /> Sécurité — Accès
             </h3>
             <p className="text-xs text-neutral-400 mt-1">
-              Deux niveaux d&apos;accès : <b className="text-[#e8c26a]">Accès complet</b> (propriétaire : gère les comptes, paiements, retraits) et <b className="text-neutral-200">Modération</b> (modère les votes/candidats). Assignez un authentificateur (Google Authenticator, Authy…) à chaque administrateur. Une fois activé, le mot de passe n&apos;est plus utilisé (sauf récupération propriétaire).
+              Deux niveaux d&apos;accès : <b className="text-[#e8c26a]">Accès complet</b> (propriétaire : gère les comptes, paiements, retraits) et <b className="text-neutral-200">Modération</b> (modère les votes/candidats). La connexion au panneau se fait exclusivement avec un code d&apos;authentification à 6 chiffres (Google Authenticator, Authy…) — il faut donc assigner un authentificateur à chaque compte avant qu&apos;il puisse se connecter.
             </p>
           </div>
           <span className="trx-badge">{admins.length} compte{admins.length > 1 ? "s" : ""}</span>
@@ -279,12 +255,6 @@ export default function AccessPanel() {
                         <ShieldOff className="size-3" /> Révoquer
                       </button>
                     )}
-                    <button
-                      onClick={() => resetPassword(admin)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all bg-white/5 text-neutral-300 border border-white/10 hover:bg-white/10 flex items-center gap-1.5"
-                    >
-                      <KeyRound className="size-3" /> Mot de passe
-                    </button>
                     <button
                       onClick={() => toggleRole(admin)}
                       disabled={admin.id === currentId}
@@ -381,37 +351,6 @@ export default function AccessPanel() {
         </ModalOverlay>
       )}
 
-      {modal && modal.type === "password" && (
-        <ModalOverlay onClose={() => setModal(null)}>
-          <div className="p-5 sm:p-6 md:p-8">
-            <div className="h-1.5 w-full bg-[#e8c26a] absolute top-0 left-0 rounded-t-2xl" />
-            {modal.busy ? (
-              <div className="flex flex-col items-center justify-center py-10 gap-3">
-                <Loader2 className="animate-spin text-[#e8c26a] size-8" />
-                <p className="text-neutral-400 text-sm">Génération du mot de passe…</p>
-              </div>
-            ) : modal.error ? (
-              <p className="text-red-400 text-center font-medium py-4">{modal.error}</p>
-            ) : modal.newPassword ? (
-              <>
-                <h3 className="text-xl font-bold font-orbitron uppercase text-white m-0">
-                  Nouveau mot de passe — {modal.name}
-                </h3>
-                <p className="text-xs text-neutral-400 mt-2">
-                  Communiquez ce mot de passe à l&apos;administrateur. Il ne sera plus jamais affiché.
-                </p>
-                <div className="mt-5 flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-4 py-3">
-                  <code className="flex-1 text-sm font-mono font-bold text-[#e8c26a] select-all">{modal.newPassword}</code>
-                  <button onClick={() => copySecret(modal.newPassword!)} className="text-neutral-400 hover:text-white" aria-label="Copier">
-                    <Copy className="size-4" />
-                  </button>
-                </div>
-              </>
-            ) : null}
-          </div>
-        </ModalOverlay>
-      )}
-
       {modal && modal.type === "create" && (
         <ModalOverlay onClose={() => setModal(null)}>
           <div className="p-5 sm:p-6 md:p-8">
@@ -422,20 +361,13 @@ export default function AccessPanel() {
                   <CheckCircle className="size-5 text-[#e8c26a]" /> Compte créé — {modal.created.username}
                 </h3>
                 <p className="text-xs text-neutral-400 mt-2">
-                  Communiquez ces identifiants à l&apos;administrateur. Le mot de passe ne sera plus jamais affiché.
+                  Communiquez l&apos;identifiant à l&apos;administrateur, puis assignez-lui un authentificateur pour qu&apos;il puisse se connecter.
                 </p>
                 <div className="mt-5">
                   <div className="text-xs text-neutral-500 uppercase tracking-wider mb-1">Identifiant</div>
                   <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-4 py-3">
                     <code className="flex-1 text-sm font-mono font-bold text-white select-all">{modal.created.username}</code>
                     <button onClick={() => copySecret(modal.created!.username)} className="text-neutral-400 hover:text-white" aria-label="Copier">
-                      <Copy className="size-4" />
-                    </button>
-                  </div>
-                  <div className="text-xs text-neutral-500 uppercase tracking-wider mb-1 mt-4">Mot de passe</div>
-                  <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-4 py-3">
-                    <code className="flex-1 text-sm font-mono font-bold text-[#e8c26a] select-all">{modal.created.password}</code>
-                    <button onClick={() => copySecret(modal.created!.password)} className="text-neutral-400 hover:text-white" aria-label="Copier">
                       <Copy className="size-4" />
                     </button>
                   </div>
@@ -453,7 +385,7 @@ export default function AccessPanel() {
                   <UserPlus className="size-5 text-[#e8c26a]" /> Nouveau compte administrateur
                 </h3>
                 <p className="text-xs text-neutral-400 mt-2">
-                  Le compte pourra accéder au panneau de modération. Un mot de passe sécurisé sera généré et affiché une seule fois.
+                  Le compte pourra accéder au panneau de modération. Assignez-lui ensuite un authentificateur pour qu&apos;il puisse se connecter.
                 </p>
                 <div className="mt-5 space-y-4">
                   <div>

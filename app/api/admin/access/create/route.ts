@@ -14,7 +14,8 @@ function strongPassword(len = 32) {
   return pw
 }
 
-/** Create a new admin account (owner only). The generated password is shown once. */
+/** Create a new admin account (owner only). A generated password is stored to satisfy the
+ *  NOT NULL column, but login is strictly MFA-only — an authenticator must be assigned. */
 export async function POST(request: Request) {
   try {
     const me = await requireOwner(request)
@@ -58,7 +59,6 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       admin: created,
-      password,
     })
   } catch (error: any) {
     console.error("Admin create error:", error)

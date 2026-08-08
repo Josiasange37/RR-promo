@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase"
-import bcrypt from "bcryptjs"
 import {
   attachSessionCookie,
   createSession,
@@ -16,14 +15,13 @@ export const dynamic = "force-dynamic"
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { username, password, code } = body
+    const { username, code } = body
 
     // Validate inputs — reject anything suspicious
     if (
       !username ||
       typeof username !== "string" ||
       username.length > 64 ||
-      (typeof password !== "string" && password !== undefined && password !== null) ||
       (typeof code !== "string" && code !== undefined && code !== null)
     ) {
       return NextResponse.json({ success: false, error: "Identifiants invalides." }, { status: 400 })
@@ -72,35 +70,24 @@ export async function POST(request: Request) {
     }
 
     if (!admin) {
-      // Constant-time dummy hash to prevent user-enumeration via timing
-      await bcrypt.compare("dummy_password_to_prevent_timing_attack", "$2b$12$dummyhashXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
       await recordFailedAttempt(key)
       return NextResponse.json({ success: false, error: "Identifiants incorrects." }, { status: 401 })
     }
 
-    let valid = false
-
-    if (admin.totp_enrolled) {
-      // Primary factor: 6-digit authenticator code.
-      const codeOk = typeof code === "string" && code.length > 0 && verifyTotp(code, admin.totp_secret ?? "")
-      // Recovery fallback for the owner(s): a valid password still works.
-      const ownerPasswordOk =
-        admin.is_owner &&
-        typeof password === "string" &&
-        password.length > 0 &&
-        (await bcrypt.compare(password, admin.password_hash))
-      valid = codeOk || ownerPasswordOk
-    } else {
-      // Not yet enrolled → password bootstrap (kept until an authenticator is assigned).
-      valid =
-        typeof password === "string" &&
-        password.length >= 8 &&
-        (await bcrypt.compare(password, admin.password_hash))
+    // MFA is strictly required for every account. Authenticator not yet
+    // assigned → no access. Password is not a supported factor anymore.
+    if (!admin.totp_enrolled) {
+      return NextResponse.json(
+        { success: false, error: "Authentificateur requis : demandez au propriétaire de vous l'assigner." },
+        { status: 403 }
+      )
     }
 
-    if (!valid) {
+    // Single factor: 6-digit authenticator code. No password fallback.
+    const codeOk = typeof code === "string" && code.length > 0 && verifyTotp(code, admin.totp_secret ?? "")
+    if (!codeOk) {
       await recordFailedAttempt(key)
-      return NextResponse.json({ success: false, error: "Identifiants incorrects." }, { status: 401 })
+      return NextResponse.json({ success: false, error: "Code de vérification incorrect." }, { status: 401 })
     }
 
     // Success — clear lockout and create session

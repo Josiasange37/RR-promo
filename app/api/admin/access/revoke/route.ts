@@ -5,8 +5,9 @@ import { requireOwner } from "@/lib/admin-auth"
 export const dynamic = "force-dynamic"
 
 /**
- * Revoke TOTP for an admin — clears their secret and enrolment so they fall
- * back to password login (used when they lose their authenticator device).
+ * Revoke TOTP for an admin — clears their secret and enrolment. The account
+ * cannot log in again until a new authenticator is assigned (used when they
+ * lose their authenticator device; login is MFA-only now).
  */
 export async function POST(request: Request) {
   try {

@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic"
 
 /**
  * Phase 2 — verify a 6-digit code from the freshly provisioned authenticator.
- * On success the admin is marked as TOTP-enrolled (password no longer accepted
- * for them, except owner recovery fallback).
+ * On success the admin is marked as TOTP-enrolled (required for login, which
+ * is strictly MFA-only).
  */
 export async function POST(request: Request) {
   try {
