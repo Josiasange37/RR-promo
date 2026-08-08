@@ -83,9 +83,21 @@ create table if not exists login_attempts (
   updated_at     timestamptz default now()
 );
 
+-- Admin payout / withdrawal journal (retraits Mobile Money)
+create table if not exists withdrawals (
+  id             text primary key,
+  amount         integer not null,
+  phone_number   text not null,
+  operator       text not null check (operator in ('MTN', 'ORANGE')),
+  reference      text not null,
+  status         text not null default 'SUCCESS' check (status in ('PENDING', 'SUCCESS', 'FAILED')),
+  created_at     timestamptz default now()
+);
+
 alter table admins enable row level security;
 alter table admin_sessions enable row level security;
 alter table login_attempts enable row level security;
+alter table withdrawals enable row level security;
 
 -- No SELECT/INSERT/UPDATE policies for public role:
 -- only the service-role client (server side) can touch these tables.

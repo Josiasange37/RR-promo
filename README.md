@@ -1,6 +1,6 @@
-# Application de Vote — Roi & Reine de Promo
+# Application de Vote — Balle Maskee 2026
 
-Application web mobile-first de vote en ligne pour l'élection du Roi et de la Reine de promotion de la Fête des Lauréats du Collège Adventiste. Conçue par XYBERCLAN.
+Application web mobile-first de vote en ligne pour l'élection du Roi et de la Reine de la Balle Maskee 2026. Conçue par XYBERCLAN.
 
 ## Fonctionnalités
 

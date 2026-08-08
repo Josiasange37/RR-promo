@@ -34,6 +34,16 @@ export interface Transaction {
   createdAt: string
 }
 
+export interface Withdrawal {
+  id: string
+  amount: number
+  phoneNumber: string
+  operator: "MTN" | "ORANGE"
+  reference: string
+  status: "PENDING" | "SUCCESS" | "FAILED"
+  createdAt: string
+}
+
 /* ─────────────────────────────────────────────────────────
    Row-to-model mappers (snake_case DB ↔ camelCase app)
 ───────────────────────────────────────────────────────── */
@@ -59,6 +69,19 @@ function rowToTransaction(row: any): Transaction {
     amount: row.amount,
     phoneNumber: row.phone_number,
     operator: row.operator as "MTN" | "ORANGE",
+    status: row.status as "PENDING" | "SUCCESS" | "FAILED",
+    createdAt: row.created_at,
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function rowToWithdrawal(row: any): Withdrawal {
+  return {
+    id: row.id,
+    amount: row.amount,
+    phoneNumber: row.phone_number,
+    operator: row.operator as "MTN" | "ORANGE",
+    reference: row.reference,
     status: row.status as "PENDING" | "SUCCESS" | "FAILED",
     createdAt: row.created_at,
   }
@@ -174,8 +197,43 @@ export async function confirmTransaction(
 }
 
 /* ─────────────────────────────────────────────────────────
-   Admin reset (wipes all transactions, zeroes all votes)
+   Withdrawals (admin payout journal)
 ───────────────────────────────────────────────────────── */
+
+export async function getWithdrawals(limit = 50): Promise<Withdrawal[]> {
+  const { data, error } = await supabaseAdmin
+    .from("withdrawals")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit)
+
+  if (error) throw new Error(`getWithdrawals: ${error.message}`)
+  return (data ?? []).map(rowToWithdrawal)
+}
+
+export async function recordWithdrawal(
+  w: { id: string; amount: number; phoneNumber: string; operator: "MTN" | "ORANGE"; reference: string }
+): Promise<Withdrawal> {
+  const { data, error } = await supabaseAdmin
+    .from("withdrawals")
+    .insert({
+      id: w.id,
+      amount: w.amount,
+      phone_number: w.phoneNumber,
+      operator: w.operator,
+      reference: w.reference,
+      status: "SUCCESS",
+    })
+    .select()
+    .single()
+
+  if (error) throw new Error(`recordWithdrawal: ${error.message}`)
+  return rowToWithdrawal(data)
+}
+
+/* ─────────────────────────────────────────────────────────
+   Admin reset (wipes all transactions, zeroes all votes)
+   ───────────────────────────────────────────────────────── */
 
 export async function resetDatabase(): Promise<void> {
   // Delete all transactions

@@ -47,7 +47,7 @@ const FAQ = [
   },
   {
     q: "Jusqu'à quand peut-on voter ?",
-    a: "Les votes sont ouverts jusqu'au jour de l'événement, le 9 août 2026. Le classement final sera annoncé lors de la Fête des Lauréats. Profitez-en pour voter avant la clôture !",
+    a: "Les votes sont ouverts jusqu'au jour de l'événement, le 9 août 2026. Le classement final sera annoncé lors de la Balle Maskee. Profitez-en pour voter avant la clôture !",
   },
   {
     q: "Mes données personnelles sont-elles sécurisées ?",
@@ -239,8 +239,8 @@ export default function CommentCaMarchePage() {
             data-reveal
             style={{ color: "rgba(255,255,255,0.48)" }}
           >
-            Tout ce que vous devez savoir pour participer à l&apos;élection du Roi et de la Reine de la Promo de la{" "}
-            <strong style={{ color: "rgba(255,255,255,0.7)" }}>Fête des Lauréats 2026</strong> du Collège Adventiste.
+            Tout ce que vous devez savoir pour participer à l&apos;élection du Roi et de la Reine de la{" "}
+            <strong style={{ color: "rgba(255,255,255,0.7)" }}>Balle Maskee 2026</strong>.
           </p>
         </div>
       </section>
@@ -264,12 +264,12 @@ export default function CommentCaMarchePage() {
               Une élection festive <em style={{ color: "#e8c26a", fontStyle: "normal" }}>par le vote populaire.</em>
             </h2>
             <p className="text-sm leading-relaxed mb-4" data-reveal style={{ color: "rgba(255,255,255,0.5)" }}>
-              Chaque année lors de la Fête des Lauréats du Collège Adventiste, les élèves et leurs proches élisent démocratiquement un <strong style={{ color: "#e8c26a" }}>Roi</strong> et une{" "}
-              <strong style={{ color: "#d04a58" }}>Reine</strong> parmi les candidats de la promotion 2026.
+              Chaque année à la Balle Maskee, les participant·es et leurs proches élisent démocratiquement un <strong style={{ color: "#e8c26a" }}>Roi</strong> et une{" "}
+              <strong style={{ color: "#d04a58" }}>Reine</strong> parmi les candidats de l&apos;édition 2026.
             </p>
             <p className="text-sm leading-relaxed" data-reveal style={{ color: "rgba(255,255,255,0.5)" }}>
               Le vote est <strong style={{ color: "rgba(255,255,255,0.75)" }}>payant</strong> : chaque vote coûte{" "}
-              <strong style={{ color: "#e8c26a" }}>100 FCFA</strong>. Les fonds collectés contribuent directement au financement de la Fête des Lauréats.
+              <strong style={{ color: "#e8c26a" }}>100 FCFA</strong>. Les fonds collectés contribuent directement au financement de la Balle Maskee.
             </p>
           </div>
 
@@ -655,7 +655,7 @@ export default function CommentCaMarchePage() {
           <p className="text-base mb-10 leading-relaxed" data-reveal style={{ color: "rgba(255,255,255,0.45)" }}>
             Soutenez votre candidat favori maintenant. Chaque vote rapproche votre candidat du titre de{" "}
             <strong style={{ color: "#e8c26a" }}>Roi</strong> ou{" "}
-            <strong style={{ color: "#d04a58" }}>Reine</strong> de la Promo 2026.
+            <strong style={{ color: "#d04a58" }}>Reine</strong> de la Balle Maskee 2026.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <motion.a

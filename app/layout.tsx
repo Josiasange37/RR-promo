@@ -20,9 +20,9 @@ const jakarta = Plus_Jakarta_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "Vote — Roi & Reine de Promo | Fête des Lauréats",
+  title: "Balle Maskee 2026 — Élection Roi & Reine",
   description:
-    "Votez pour élire le Roi et la Reine de promotion de la Fête des Lauréats du Collège Adventiste. 100 FCFA par vote — Mobile Money.",
+    "Votez pour élire le Roi et la Reine de la Balle Maskee 2026. 100 FCFA par vote — Mobile Money. Votre voix décide de la couronne.",
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -42,7 +42,7 @@ const HOW_IT_WORKS: [string, string, string][] = [
   ["03", "Valide", "Confirme la transaction sur ton téléphone (prompt USSD) pour valider tes votes."],
 ]
 
-const VIDEO_SRC = "/hero-graduation.mp4"
+const VIDEO_SRC = "/hero-balle-maskee.mp4"
 
 
 function d(ms: number): React.CSSProperties {
@@ -117,10 +117,14 @@ export default function Page() {
 
     const ctx = gsap.context(() => {
       const video = hero.querySelector("video")
+      const bg = hero.querySelector(".hero-bg")
       const content = hero.querySelector(".hero-content")
 
       if (video) {
         gsap.fromTo(video, { yPercent: 0 }, { yPercent: 14, ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true } })
+      }
+      if (bg) {
+        gsap.fromTo(bg, { scale: 1 }, { scale: 1.12, ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true } })
       }
       if (content) {
         gsap.fromTo(content, { opacity: 1, y: 0 }, { opacity: 0, y: -60, ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "bottom 20%", scrub: true } })
@@ -236,12 +240,12 @@ export default function Page() {
     src: c.imageUrl,
     alt: `Candidat ${c.name}`,
     title: c.name,
-    subtitle: `${c.category} de Promo · ${c.class}`,
+    subtitle: `${c.category} de la Balle Maskee · ${c.class}`,
     accentColor: c.category === "Roi" ? "#e8c26a" : "#d04a58",
     accentText: c.category === "Roi" ? "#101014" : "#ffffff",
     meta: [
       { label: "Votes cumulés", value: `${c.votes} voix` },
-      { label: "Promo", value: "2026" },
+      { label: "Balle Maskee", value: "2026" },
     ],
   }))
 
@@ -251,9 +255,23 @@ export default function Page() {
           CINEMATIC HERO
          ══════════════════════════════════════════════════════════════ */}
       <div id="top" ref={heroRef} className="cinematic-hero">
+        {/* Themed gradient base — always renders, even before/without the video */}
+        <div
+          className="hero-bg absolute inset-0"
+          style={{
+            zIndex: 0,
+            background:
+              "radial-gradient(ellipse 90% 70% at 15% 0%, rgba(232,194,106,0.16) 0%, transparent 60%), " +
+              "radial-gradient(ellipse 70% 50% at 85% 105%, rgba(164,32,46,0.28) 0%, transparent 55%), " +
+              "radial-gradient(ellipse 55% 45% at 70% 0%, rgba(92,45,134,0.22) 0%, transparent 55%), " +
+              "#0c0c12",
+          }}
+          aria-hidden="true"
+        />
+
         <video
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ zIndex: 0 }}
+          style={{ zIndex: 1 }}
           src={VIDEO_SRC}
           autoPlay
           muted
@@ -262,15 +280,16 @@ export default function Page() {
           aria-hidden="true"
         />
 
-        <div className="bottom-blur-overlay absolute inset-0 pointer-events-none" style={{ zIndex: 1 }} aria-hidden="true" />
+        <div className="bottom-blur-overlay absolute inset-0 pointer-events-none" style={{ zIndex: 2 }} aria-hidden="true" />
 
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            zIndex: 2,
+            zIndex: 3,
             background:
-              "radial-gradient(ellipse 80% 50% at 20% 110%, rgba(164,32,46,0.22) 0%, transparent 60%), " +
-              "radial-gradient(ellipse 60% 40% at 80% 110%, rgba(92,45,134,0.20) 0%, transparent 55%)",
+              "radial-gradient(ellipse 80% 50% at 20% 110%, rgba(164,32,46,0.18) 0%, transparent 60%), " +
+              "radial-gradient(ellipse 60% 40% at 80% 110%, rgba(92,45,134,0.16) 0%, transparent 55%), " +
+              "radial-gradient(ellipse 45% 35% at 50% 20%, rgba(232,194,106,0.10) 0%, transparent 60%)",
           }}
           aria-hidden="true"
         />
@@ -285,12 +304,12 @@ export default function Page() {
                 <span className="flex items-center gap-1.5">
                   <Star size={16} strokeWidth={1.5} className="sm:w-5 sm:h-5 flex-none" style={{ fill: "#e8c26a", color: "#e8c26a" }} aria-hidden="true" />
                   <span className="font-semibold" style={{ color: "#e8c26a" }}>
-                    Fête des Lauréats 2026
+                    Balle Maskee 2026
                   </span>
                 </span>
                 <span className="flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.55)" }}>
                   <Clock size={16} strokeWidth={1.5} className="sm:w-5 sm:h-5 flex-none" aria-hidden="true" />
-                  Collège Adventiste
+                  Soirée de gala
                 </span>
                 <span className="flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.55)" }}>
                   <Calendar size={16} strokeWidth={1.5} className="sm:w-5 sm:h-5 flex-none" aria-hidden="true" />
@@ -310,11 +329,11 @@ export default function Page() {
                   textTransform: "uppercase",
                 }}
               >
-                Élis ton <em style={{ color: "#e8c26a", fontStyle: "normal" }}>Roi &amp; ta Reine.</em>
+                Élis ton <em style={{ color: "#e8c26a", fontStyle: "normal" }}>Roi &amp; ta Reine</em> de la Balle Maskee.
               </h1>
 
               <p className="animate-blur-fade-up text-base sm:text-lg md:text-xl mb-6 md:mb-12 max-w-2xl leading-relaxed" style={{ ...d(500), color: "rgba(255,255,255,0.52)" }}>
-                Vote pour tes candidats préférés — 100 FCFA par vote via Mobile Money. Chaque paiement validé est comptabilisé instantanément.
+                La grande Balle Maskee 2026 approche. Vote pour tes candidats préférés — 100 FCFA par vote via Mobile Money. Chaque paiement validé est comptabilisé instantanément.
               </p>
 
               <div className="flex flex-wrap gap-3 sm:gap-4">
@@ -418,7 +437,7 @@ export default function Page() {
                   <div className="mt-4 flex justify-between items-end">
                     <div>
                       <h3 className="text-xl font-bold tracking-tight text-white m-0 uppercase font-orbitron">{candidate.name}</h3>
-                      <p className="text-xs text-neutral-400 mt-1">Collège Adventiste · Promo 2026</p>
+                      <p className="text-xs text-neutral-400 mt-1">Balle Maskee · Édition 2026</p>
                     </div>
                     <div className="text-right">
                       <span className="text-xs text-neutral-400 block uppercase">Votes</span>
@@ -497,11 +516,11 @@ export default function Page() {
       {candidates.length > 0 && (
         <section id="candidats" className="section awards-carousel">
           <div className="section-intro" data-reveal>
-            <p className="eyebrow">En lumière</p>
+            <p className="eyebrow">À la une</p>
             <h2>
-              Les lauréats
+              Roi &amp; Reine
               <br />
-              <em>sous les projecteurs.</em>
+              <em>de la Balle Maskee.</em>
             </h2>
           </div>
           <div className="mt-14" data-reveal>
@@ -512,7 +531,7 @@ export default function Page() {
               showPagination
               loop
               autoPlay={3500}
-              label="Candidats au trône de la promo"
+              label="Candidats au trône de la Balle Maskee"
               onVote={(index) => {
                 const candidate = candidates[index]
                 if (candidate) {
@@ -554,7 +573,7 @@ export default function Page() {
           <CornerFrame data-reveal className="category-card p-6 sm:p-8">
             <div className="flex items-center gap-2.5 mb-6">
               <Crown className="text-[#e8c26a] size-6" />
-              <h3 className="text-xl font-orbitron font-bold text-[#e8c26a] m-0">Roi de Promo</h3>
+              <h3 className="text-xl font-orbitron font-bold text-[#e8c26a] m-0">Roi de la Balle</h3>
             </div>
             <div className="space-y-4">
               {loadingCandidates ? (
@@ -587,7 +606,7 @@ export default function Page() {
           <CornerFrame data-reveal className="category-card p-6 sm:p-8">
             <div className="flex items-center gap-2.5 mb-6">
               <Gem className="text-[#d04a58] size-6" />
-              <h3 className="text-xl font-orbitron font-bold text-[#d04a58] m-0">Reine de Promo</h3>
+              <h3 className="text-xl font-orbitron font-bold text-[#d04a58] m-0">Reine de la Balle</h3>
             </div>
             <div className="space-y-4">
               {loadingCandidates ? (
@@ -718,7 +737,7 @@ export default function Page() {
                       <span className="text-xs text-neutral-400 uppercase tracking-widest block">Voter pour</span>
                       <h4 className="text-xl font-bold font-orbitron tracking-tight text-white uppercase m-0">{selectedCandidate.name}</h4>
                       <span className="text-xs text-neutral-400">
-                        {selectedCandidate.category === "Roi" ? "Roi" : "Reine"} de Promo · {selectedCandidate.class}
+                        {selectedCandidate.category === "Roi" ? "Roi" : "Reine"} de la Balle Maskee · {selectedCandidate.class}
                       </span>
                     </div>
                   </div>

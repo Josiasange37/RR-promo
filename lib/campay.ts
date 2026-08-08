@@ -97,7 +97,7 @@ export async function requestCollection(params: {
         amount: String(amount),
         currency: "XAF",
         from: formattedPhone,
-        description: `Vote Promo FDL - R:${externalReference}`,
+        description: `Vote Balle Maskee - R:${externalReference}`,
         external_reference: externalReference,
       }),
     })
@@ -126,6 +126,62 @@ export async function requestCollection(params: {
       reference: `fallback-ref-${externalReference}`,
       status: "PENDING",
     }
+  }
+}
+
+/**
+ * Request a deposit (payout / retrait) to a Mobile Money number via CamPay.
+ * Used in the admin panel to withdraw collected funds to MTN MoMo / Orange Money.
+ */
+export async function requestDeposit(params: {
+  amount: number
+  phoneNumber: string
+  externalReference: string
+}): Promise<{ reference: string; status: "PENDING" | "SUCCESS" | "FAILED" }> {
+  const { amount, phoneNumber, externalReference } = params
+
+  // Normalize phone number to include country code (e.g. 237xxxxxxxxx)
+  let formattedPhone = phoneNumber.trim().replace(/\s+/g, "")
+  if (formattedPhone.startsWith("+")) {
+    formattedPhone = formattedPhone.substring(1)
+  }
+  if (!formattedPhone.startsWith("237")) {
+    formattedPhone = "237" + formattedPhone
+  }
+
+  if (isSandbox()) {
+    console.log(`[CamPay Sandbox] Simulating deposit of ${amount} FCFA to ${formattedPhone}`)
+    // In sandbox we treat the payout as successful immediately.
+    return {
+      reference: `sandbox-deposit-${externalReference}`,
+      status: "SUCCESS",
+    }
+  }
+
+  const res = await fetch(`${CAMPAY_API_URL}/deposit/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${await getAuthToken()}`,
+    },
+    body: JSON.stringify({
+      amount: String(amount),
+      to: formattedPhone,
+      currency: "XAF",
+      description: `Retrait Balle Maskee - R:${externalReference}`,
+      external_reference: externalReference,
+    }),
+  })
+
+  if (!res.ok) {
+    const errText = await res.text()
+    throw new Error(`CamPay deposit request failed: ${errText}`)
+  }
+
+  const data = await res.json()
+  return {
+    reference: data.reference,
+    status: data.status === "SUCCESS" ? "SUCCESS" : data.status === "FAILED" ? "FAILED" : "PENDING",
   }
 }
 
