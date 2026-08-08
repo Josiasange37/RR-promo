@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase"
+import bcrypt from "bcryptjs"
 import {
   attachSessionCookie,
   createSession,
@@ -15,13 +16,14 @@ export const dynamic = "force-dynamic"
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { username, code } = body
+    const { username, password, code } = body
 
     // Validate inputs — reject anything suspicious
     if (
       !username ||
       typeof username !== "string" ||
       username.length > 64 ||
+      (typeof password !== "string" && password !== undefined && password !== null) ||
       (typeof code !== "string" && code !== undefined && code !== null)
     ) {
       return NextResponse.json({ success: false, error: "Identifiants invalides." }, { status: 400 })
@@ -70,12 +72,14 @@ export async function POST(request: Request) {
     }
 
     if (!admin) {
+      // Constant-time dummy hash to prevent user-enumeration via timing
+      await bcrypt.compare("dummy_password_to_prevent_timing_attack", "$2b$12$dummyhashXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
       await recordFailedAttempt(key)
       return NextResponse.json({ success: false, error: "Identifiants incorrects." }, { status: 401 })
     }
 
     // MFA is strictly required for every account. Authenticator not yet
-    // assigned → no access. Password is not a supported factor anymore.
+    // assigned → no access.
     if (!admin.totp_enrolled) {
       return NextResponse.json(
         { success: false, error: "Authentificateur requis : demandez au propriétaire de vous l'assigner." },
@@ -83,7 +87,13 @@ export async function POST(request: Request) {
       )
     }
 
-    // Single factor: 6-digit authenticator code. No password fallback.
+    // Factor 1: password (bcrypt).
+    if (!password || typeof password !== "string" || !(await bcrypt.compare(password, admin.password_hash))) {
+      await recordFailedAttempt(key)
+      return NextResponse.json({ success: false, error: "Mot de passe incorrect." }, { status: 401 })
+    }
+
+    // Factor 2: 6-digit authenticator code.
     const codeOk = typeof code === "string" && code.length > 0 && verifyTotp(code, admin.totp_secret ?? "")
     if (!codeOk) {
       await recordFailedAttempt(key)

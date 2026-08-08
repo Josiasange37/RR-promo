@@ -14,6 +14,9 @@ import {
   Crown,
   Gem,
   User,
+  KeyRound,
+  Eye,
+  EyeOff,
   Wallet,
   ArrowDownUp,
   Smartphone,
@@ -64,7 +67,9 @@ interface WithdrawalItem {
 
 export default function AdminPanel() {
   const [username, setUsername] = useState<string>("")
+  const [password, setPassword] = useState<string>("")
   const [totpCode, setTotpCode] = useState<string>("")
+  const [showPassword, setShowPassword] = useState<boolean>(false)
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
   const [loginError, setLoginError] = useState<string>("")
   const [loginLoading, setLoginLoading] = useState<boolean>(false)
@@ -155,7 +160,11 @@ export default function AdminPanel() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!username.trim() || totpCode.trim().length !== 6) return
+    if (!username.trim() || !password) return
+    if (totpCode.trim().length !== 6) {
+      setLoginError("Saisissez le code de vérification à 6 chiffres.")
+      return
+    }
     setLoginLoading(true)
     setLoginError("")
 
@@ -165,12 +174,14 @@ export default function AdminPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: username.trim(),
+          password,
           code: totpCode.trim(),
         }),
       })
       const data = await safeJson(res)
       if (data.success) {
         await loadDashboard()
+        setPassword("")
         setTotpCode("")
       } else {
         setLoginError(data.error || "Identifiants incorrects.")
@@ -190,6 +201,7 @@ export default function AdminPanel() {
     }
     setIsLoggedIn(false)
     setUsername("")
+    setPassword("")
     setTotpCode("")
     setStats(null)
   }
@@ -299,7 +311,34 @@ export default function AdminPanel() {
 
             <div>
               <label className="text-xs font-semibold text-neutral-300 uppercase tracking-wider block mb-2">
-                Code de vérification
+                Mot de passe
+              </label>
+              <div className="relative">
+                <KeyRound className="absolute left-4 top-3.5 text-neutral-500 size-4" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  autoComplete="current-password"
+                  placeholder="••••••••••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full h-12 pl-11 pr-12 bg-black/40 border border-white/10 rounded-xl font-medium text-white outline-none focus:border-[#e8c26a]/40 transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                  aria-pressed={showPassword}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-neutral-300 uppercase tracking-wider block mb-2">
+                Code de vérification <span className="text-neutral-500 normal-case font-normal">(6 chiffres)</span>
               </label>
               <div className="relative">
                 <Smartphone className="absolute left-4 top-3.5 text-neutral-500 size-4" />
@@ -316,8 +355,7 @@ export default function AdminPanel() {
                 />
               </div>
               <p className="text-[10px] text-neutral-500 mt-1.5">
-                Saisissez le code à 6 chiffres de votre application d&apos;authentification. Associez votre
-                compte avant de vous connecter.
+                Saisissez le code à 6 chiffres de votre application d&apos;authentification.
               </p>
             </div>
 
@@ -330,6 +368,11 @@ export default function AdminPanel() {
                 <span>{loginError}</span>
               </div>
             )}
+
+            <p className="text-[10px] text-neutral-500 text-center">
+              Identifiant ou mot de passe perdu ? Contactez un administrateur avec accès complet : il pourra
+              régénérer votre mot de passe depuis le panneau Sécurité → Accès.
+            </p>
 
             <button
               type="submit"

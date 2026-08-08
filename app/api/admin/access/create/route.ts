@@ -59,6 +59,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       admin: created,
+      password,
     })
   } catch (error: any) {
     console.error("Admin create error:", error)
