@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { getCandidateById, recordTransaction } from "@/lib/db-supabase"
-import { requestCollection } from "@/lib/camerpay"
+import { requestCollection, resolvePublicBaseUrl } from "@/lib/camerpay"
 
 export const dynamic = "force-dynamic"
 
@@ -55,14 +55,21 @@ export async function POST(request: Request) {
     })
 
     // 4. Request the CamerPay hosted payment
-    const origin = new URL(request.url).origin
+    const publicBase = resolvePublicBaseUrl(request.url)
+    if (!publicBase) {
+      console.error("[API Initiate] No public base URL — set CAMERPAY_PUBLIC_URL (e.g. https://votre-site.vercel.app)")
+      return NextResponse.json(
+        { success: false, error: "URL publique non configurée (CAMERPAY_PUBLIC_URL manquant)." },
+        { status: 500 }
+      )
+    }
     console.log(`[API Initiate] Starting payment request for transaction ${txId}`)
     const payResult = await requestCollection({
       amount,
       phoneNumber,
       externalReference: txId,
-      callbackUrl: `${origin}/api/vote/webhook`,
-      returnUrl: `${origin}?tx=${txId}`,
+      callbackUrl: `${publicBase}/api/vote/webhook`,
+      returnUrl: `${publicBase}?tx=${txId}`,
       operator,
     })
 

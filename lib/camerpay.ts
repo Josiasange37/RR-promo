@@ -51,6 +51,30 @@ function paymentMethod(operator: "MTN" | "ORANGE"): string {
   return operator === "ORANGE" ? "orange_money" : "mtn_momo"
 }
 
+const INTERNAL_HOSTS = /^(localhost|127\.0\.0\.1|0\.0\.0\.0|::1|\[::1\])$/i
+
+/**
+ * Resolve the public base URL used for merchant_callback_url / merchant_return_url.
+ * CamerPay rejects callback URLs that point to internal hosts (localhost, 127.0.0.1),
+ * so a public base must be configured when running outside production.
+ */
+export function resolvePublicBaseUrl(requestUrl?: string): string {
+  const fromEnv = process.env.CAMERPAY_PUBLIC_URL
+  if (fromEnv) return fromEnv.replace(/\/+$/, "")
+
+  if (requestUrl) {
+    try {
+      const { protocol, host } = new URL(requestUrl)
+      if (!INTERNAL_HOSTS.test(host)) return `${protocol}//${host}`
+    } catch {
+      /* fall through */
+    }
+  }
+  const deployed = process.env.VERCEL_URL || process.env.NEXT_PUBLIC_SITE_URL
+  if (deployed) return `https://${deployed.replace(/^https?:\/\//, "").replace(/\/+$/, "")}`
+  return ""
+}
+
 /**
  * Initiate a hosted Camer payment. Returns the reference the voter must
  * finish payment (and storage) on.
