@@ -4,7 +4,7 @@ import { confirmTransaction } from "./db-supabase"
 /**
  * lib/cameray.ts — Camer hosted-payment integration.
  *
- * - Payments are POSTed to /payments/initiate which returns a pay_url the voter
+ * - Payments are POSTed to /payment/initiate which returns a pay_url the voter
  *   is redirected to (hosted flow).
  * - Confirmation arrives as a signed webhook on merchant_callback_url.
  *   Signature = HMAC-SHA256 over `uuid|invoice_id|status|amount` (amount with
@@ -72,7 +72,7 @@ export async function requestCollection(params: {
     return { payUrl: `${sandboxReturn}?tx=${encodeURIComponent(externalReference)}`, status: "PENDING" }
   }
 
-  const res = await fetch(`${CAMERPAY_API_URL}/payments/initiate`, {
+  const res = await fetch(`${CAMERPAY_API_URL}/payment/initiate`, {
     method: "POST",
     headers: await authHeaders(),
     body: JSON.stringify({
@@ -102,7 +102,7 @@ export async function requestCollection(params: {
 export async function checkTransactionStatus(reference: string): Promise<"SUCCESS" | "FAILED" | "PENDING"> {
   if (isSandbox()) return "PENDING"
   try {
-    const res = await fetch(`${CAMERPAY_API_URL}/payments/${reference}/status`, {
+    const res = await fetch(`${CAMERPAY_API_URL}/payment/${reference}/status`, {
       headers: await authHeaders(),
       signal: AbortSignal.timeout(15000),
     })
