@@ -357,15 +357,16 @@ export default function ClassementPage() {
       <AnimatePresence>
       {selectedCandidate && (
         <motion.div
-          className="fixed inset-0 z-[999] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[999] overflow-y-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
         >
-          <motion.div className="absolute inset-0 bg-black/80 backdrop-blur-md" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedCandidate(null)} />
+          <motion.div className="fixed inset-0 bg-black/80 backdrop-blur-md" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedCandidate(null)} />
+          <div className="relative z-10 min-h-full flex items-center justify-center p-4 sm:p-6">
           <motion.div
-            className="relative w-full max-w-sm bg-[#14141c] border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-10 p-8 flex flex-col items-center text-center gap-4"
+            className="relative w-full max-w-sm bg-[#14141c] border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-10 p-6 sm:p-8 flex flex-col items-center text-center gap-4"
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.97 }}
@@ -392,6 +393,7 @@ export default function ClassementPage() {
               </motion.a>
             </div>
           </motion.div>
+          </div>
         </motion.div>
       )}
       </AnimatePresence>

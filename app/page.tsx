@@ -681,7 +681,7 @@ export default function Page() {
       <AnimatePresence>
       {selectedCandidate && (
         <motion.div
-          className="fixed inset-0 z-[999] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[999] overflow-y-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -689,7 +689,7 @@ export default function Page() {
         >
           {/* Backdrop Blur */}
           <motion.div
-            className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -700,14 +700,16 @@ export default function Page() {
             }}
           />
 
-          {/* Modal Card */}
-          <motion.div
-            className="relative w-full max-w-lg bg-[#14141c] border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-10 transition-all duration-300 transform scale-100 flex flex-col"
-            initial={{ opacity: 0, y: 40, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 24, scale: 0.97 }}
-            transition={{ type: "spring", damping: 24, stiffness: 300, delay: 0.05 }}
-          >
+          {/* Centering wrapper — grows with content, centers when short */}
+          <div className="relative z-10 min-h-full flex items-center justify-center p-4 sm:p-6">
+            {/* Modal Card */}
+            <motion.div
+              className="relative w-full max-w-lg bg-[#14141c] border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-10 transition-all duration-300 transform scale-100 flex flex-col"
+              initial={{ opacity: 0, y: 40, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.97 }}
+              transition={{ type: "spring", damping: 24, stiffness: 300, delay: 0.05 }}
+            >
             {/* Header banner color */}
             <div className={`h-2 w-full ${selectedCandidate.category === "Roi" ? "bg-[#e8c26a]" : "bg-[#d04a58]"}`} />
 
@@ -723,7 +725,7 @@ export default function Page() {
             )}
 
             {/* Modal Content container */}
-            <div className="p-6 md:p-8 overflow-y-auto max-h-[85vh]">
+            <div className="p-5 sm:p-6 md:p-8 overflow-y-auto overflow-x-hidden max-h-[85vh]">
               {/* IDLE / INPUT STATE */}
               {flowState === "idle" && (
                 <form onSubmit={handleVoteSubmit}>
@@ -956,6 +958,7 @@ export default function Page() {
               )}
             </div>
           </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

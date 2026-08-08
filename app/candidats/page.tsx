@@ -322,14 +322,14 @@ export default function CandidatsPage() {
       <AnimatePresence>
       {selectedCandidate && (
         <motion.div
-          className="fixed inset-0 z-[999] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[999] overflow-y-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
         >
           <motion.div
-            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -337,6 +337,7 @@ export default function CandidatsPage() {
               if (flowState !== "initiating" && flowState !== "pending_ussd") setSelectedCandidate(null)
             }}
           />
+          <div className="relative z-10 min-h-full flex items-center justify-center p-4 sm:p-6">
           <motion.div
             className="relative w-full max-w-lg bg-[#14141c] border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-10 flex flex-col"
             initial={{ opacity: 0, y: 40, scale: 0.96 }}
@@ -350,7 +351,7 @@ export default function CandidatsPage() {
                 <X size={18} />
               </button>
             )}
-            <div className="p-6 md:p-8 overflow-y-auto max-h-[85vh]">
+            <div className="p-5 sm:p-6 md:p-8 overflow-y-auto overflow-x-hidden max-h-[85vh]">
               {flowState === "idle" && (
                 <form onSubmit={handleVoteSubmit}>
                   <div className="flex gap-4 items-center">
@@ -443,6 +444,7 @@ export default function CandidatsPage() {
               )}
             </div>
           </motion.div>
+          </div>
         </motion.div>
       )}
       </AnimatePresence>

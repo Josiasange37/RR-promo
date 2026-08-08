@@ -312,7 +312,7 @@ export default function AccessPanel() {
 
       {modal && modal.type === "qr" && (
         <ModalOverlay onClose={() => setModal(null)}>
-          <div className="p-6 md:p-8">
+          <div className="p-5 sm:p-6 md:p-8">
             <div className="h-1.5 w-full bg-[#e8c26a] absolute top-0 left-0 rounded-t-2xl" />
             <h3 className="text-xl font-bold font-orbitron uppercase text-white m-0 flex items-center gap-2">
               <Smartphone className="size-5 text-[#e8c26a]" /> Authentificateur — {modal.admin.username}
@@ -377,7 +377,7 @@ export default function AccessPanel() {
 
       {modal && modal.type === "password" && (
         <ModalOverlay onClose={() => setModal(null)}>
-          <div className="p-6 md:p-8">
+          <div className="p-5 sm:p-6 md:p-8">
             <div className="h-1.5 w-full bg-[#e8c26a] absolute top-0 left-0 rounded-t-2xl" />
             {modal.busy ? (
               <div className="flex flex-col items-center justify-center py-10 gap-3">
@@ -408,7 +408,7 @@ export default function AccessPanel() {
 
       {modal && modal.type === "create" && (
         <ModalOverlay onClose={() => setModal(null)}>
-          <div className="p-6 md:p-8">
+          <div className="p-5 sm:p-6 md:p-8">
             <div className="h-1.5 w-full bg-[#e8c26a] absolute top-0 left-0 rounded-t-2xl" />
             {modal.created ? (
               <>
@@ -501,10 +501,12 @@ export default function AccessPanel() {
 
 function ModalOverlay({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-[#14141c] border border-white/10 rounded-2xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
-        {children}
+    <div className="fixed inset-0 z-[999] overflow-y-auto">
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
+      <div className="relative z-10 min-h-full flex items-center justify-center p-4 sm:p-6">
+        <div className="relative w-full max-w-md bg-[#14141c] border border-white/10 rounded-2xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto overflow-x-hidden">
+          {children}
+        </div>
       </div>
     </div>
   )
