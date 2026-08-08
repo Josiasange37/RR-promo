@@ -338,10 +338,10 @@ export default function AccessPanel() {
                   <div className="mt-4 text-center text-xs text-neutral-400">
                     Ou saisissez manuellement la clé dans l&apos;application :
                   </div>
-                  <div className="mt-2 flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-3 sm:px-4 py-3">
-                    <code className="flex-1 text-xs text-[#e8c26a] font-mono break-all select-all">{modal.data.secret}</code>
-                    <button onClick={() => modal.data && copySecret(modal.data.secret)} className="flex-none text-neutral-400 hover:text-white transition-colors" aria-label="Copier le secret">
-                      <Copy className="size-4" />
+                  <div className="mt-2 bg-black/40 border border-white/10 rounded-xl px-3 sm:px-4 py-3 w-full">
+                    <code className="block text-xs text-[#e8c26a] font-mono break-all select-all">{modal.data.secret}</code>
+                    <button onClick={() => modal.data && copySecret(modal.data.secret)} className="mt-2 inline-flex items-center gap-1.5 text-neutral-400 hover:text-white transition-colors text-xs" aria-label="Copier le secret">
+                      <Copy className="size-3.5" /> Copier la clé
                     </button>
                   </div>
                 </>
@@ -354,7 +354,7 @@ export default function AccessPanel() {
                   <label className="text-xs font-semibold text-neutral-300 uppercase tracking-wider block mb-2">
                     Code de validation (6 chiffres)
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-3">
                     <input
                       type="text"
                       inputMode="numeric"
@@ -363,12 +363,12 @@ export default function AccessPanel() {
                       autoFocus
                       value={modal.code}
                       onChange={(e) => setModal({ ...modal, code: e.target.value.replace(/[^0-9]/g, "").slice(0, 6) })}
-                      className="flex-1 h-12 px-4 bg-black/40 border border-white/10 rounded-xl font-mono text-center tracking-[0.5em] text-lg text-white outline-none focus:border-[#e8c26a]/40"
+                      className="w-full h-12 px-4 bg-black/40 border border-white/10 rounded-xl font-mono text-center tracking-[0.5em] text-lg text-white outline-none focus:border-[#e8c26a]/40"
                     />
                     <button
                       onClick={confirmEnroll}
                       disabled={modal.busy || modal.code.trim().length !== 6}
-                      className="px-6 h-12 rounded-xl bg-[#e8c26a] text-black font-bold uppercase tracking-wider text-sm transition-all hover:opacity-90 disabled:opacity-40 flex items-center gap-2 whitespace-nowrap"
+                      className="w-full h-12 rounded-xl bg-[#e8c26a] text-black font-bold uppercase tracking-wider text-sm transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2 whitespace-nowrap"
                     >
                       {modal.busy ? <Loader2 className="animate-spin size-4" /> : <CheckCircle className="size-4" />}
                       Activer
