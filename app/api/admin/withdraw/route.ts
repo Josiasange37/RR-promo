@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase"
-import { readSessionCookie, verifySessionToken } from "@/lib/admin-auth"
+import { requireOwner } from "@/lib/admin-auth"
 import { requestDeposit } from "@/lib/campay"
 import { getWithdrawals, recordWithdrawal } from "@/lib/db-supabase"
 
@@ -8,8 +8,8 @@ export const dynamic = "force-dynamic"
 
 export async function GET(request: Request) {
   try {
-    const token = readSessionCookie(request)
-    if (!token || !(await verifySessionToken(token))) {
+    const owner = await requireOwner(request)
+    if (!owner) {
       return NextResponse.json({ success: false, error: "Non autorisé" }, { status: 401 })
     }
 
@@ -26,8 +26,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const token = readSessionCookie(request)
-    if (!token || !(await verifySessionToken(token))) {
+    const owner = await requireOwner(request)
+    if (!owner) {
       return NextResponse.json({ success: false, error: "Non autorisé" }, { status: 401 })
     }
 

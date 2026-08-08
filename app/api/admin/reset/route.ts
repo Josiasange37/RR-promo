@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 import { resetDatabase } from "@/lib/db-supabase"
-import { readSessionCookie, verifySessionToken } from "@/lib/admin-auth"
+import { requireOwner } from "@/lib/admin-auth"
 
 export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
   try {
-    const token = readSessionCookie(request)
-    if (!token || !(await verifySessionToken(token))) {
+    const owner = await requireOwner(request)
+    if (!owner) {
       return NextResponse.json({ success: false, error: "Non autorisé" }, { status: 401 })
     }
 

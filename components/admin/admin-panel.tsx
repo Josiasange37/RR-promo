@@ -390,12 +390,14 @@ export default function AdminPanel() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <button
-            onClick={handleResetDB}
-            className="px-5 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2"
-          >
-            <Trash2 size={15} /> Réinitialiser
-          </button>
+          {currentIsOwner && (
+            <button
+              onClick={handleResetDB}
+              className="px-5 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2"
+            >
+              <Trash2 size={15} /> Réinitialiser
+            </button>
+          )}
           <button
             onClick={handleLogout}
             className="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2"
@@ -450,7 +452,9 @@ export default function AdminPanel() {
               )}
             </div>
 
-            <form onSubmit={handleWithdraw} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {currentIsOwner ? (
+              <>
+                <form onSubmit={handleWithdraw} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="text-xs font-semibold text-neutral-300 uppercase tracking-wider block mb-2">Montant (FCFA)</label>
                 <input
@@ -515,14 +519,20 @@ export default function AdminPanel() {
             </form>
 
             {wdMessage && (
-              <p
-                className={`mt-4 text-xs font-medium rounded-lg px-4 py-2 border ${
-                  wdMessage.type === "success"
-                    ? "text-green-400 bg-green-500/10 border-green-500/20"
-                    : "text-red-400 bg-red-500/10 border-red-500/20"
-                }`}
-              >
-                {wdMessage.text}
+                  <p
+                    className={`mt-4 text-xs font-medium rounded-lg px-4 py-2 border ${
+                      wdMessage.type === "success"
+                        ? "text-green-400 bg-green-500/10 border-green-500/20"
+                        : "text-red-400 bg-red-500/10 border-red-500/20"
+                    }`}
+                  >
+                    {wdMessage.text}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="text-xs text-neutral-500 bg-white/[0.02] border border-white/5 rounded-xl px-4 py-4">
+                Retrait réservé aux administrateurs à accès complet.
               </p>
             )}
 

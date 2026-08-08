@@ -13,6 +13,7 @@ import {
   Crown,
   Smartphone,
   UserPlus,
+  Trash2,
 } from "lucide-react"
 import { CornerFrame } from "@/components/ui/motifs"
 
@@ -40,6 +41,7 @@ type Modal =
 
 export default function AccessPanel() {
   const [admins, setAdmins] = useState<AdminUser[]>([])
+  const [currentId, setCurrentId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [modal, setModal] = useState<Modal>(null)
@@ -48,8 +50,10 @@ export default function AccessPanel() {
     try {
       const res = await fetch("/api/admin/access")
       const data = await res.json()
-      if (data.success) setAdmins(data.admins ?? [])
-      else setError(data.error || "Impossible de charger les accès.")
+      if (data.success) {
+        setAdmins(data.admins ?? [])
+        if (data.current?.id) setCurrentId(data.current.id)
+      } else setError(data.error || "Impossible de charger les accès.")
     } catch {
       setError("Erreur réseau.")
     } finally {
@@ -160,6 +164,40 @@ export default function AccessPanel() {
     }
   }
 
+  const toggleRole = async (admin: AdminUser) => {
+    const promote = !admin.isOwner
+    const label = admin.username
+    if (!confirm(promote ? `Accorder les droits de propriétaire (accès complet) à « ${label} » ?` : `Retirer les droits de propriétaire de « ${label} » ?`)) return
+    try {
+      const res = await fetch("/api/admin/access/role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminId: admin.id, makeOwner: promote }),
+      })
+      const data = await res.json()
+      alert(data.success ? (promote ? "Droits accordés (accès complet)." : "Droits retirés.") : (data.error ?? "Échec."))
+      if (data.success) load()
+    } catch {
+      alert("Erreur réseau.")
+    }
+  }
+
+  const remove = async (admin: AdminUser) => {
+    if (!confirm(`Supprimer définitivement le compte « ${admin.username} » ? Cette action est irréversible.`)) return
+    try {
+      const res = await fetch("/api/admin/access/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminId: admin.id }),
+      })
+      const data = await res.json()
+      alert(data.success ? `Compte « ${admin.username} » supprimé.` : data.error ?? "Échec.")
+      if (data.success) load()
+    } catch {
+      alert("Erreur réseau.")
+    }
+  }
+
   const copySecret = (secret: string) => {
     try {
       navigator.clipboard?.writeText(secret)
@@ -178,7 +216,7 @@ export default function AccessPanel() {
               <ShieldCheck className="size-5" /> Sécurité — Accès
             </h3>
             <p className="text-xs text-neutral-400 mt-1">
-              Assignez un authentificateur (Google Authenticator, Authy…) à chaque administrateur. Une fois activé, le mot de passe n&apos;est plus utilisé (sauf récupération propriétaire).
+              Deux niveaux d&apos;accès : <b className="text-[#e8c26a]">Accès complet</b> (propriétaire : gère les comptes, paiements, retraits) et <b className="text-neutral-200">Modération</b> (modère les votes/candidats). Assignez un authentificateur (Google Authenticator, Authy…) à chaque administrateur. Une fois activé, le mot de passe n&apos;est plus utilisé (sauf récupération propriétaire).
             </p>
           </div>
           <span className="trx-badge">{admins.length} compte{admins.length > 1 ? "s" : ""}</span>
@@ -245,6 +283,23 @@ export default function AccessPanel() {
                       className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all bg-white/5 text-neutral-300 border border-white/10 hover:bg-white/10 flex items-center gap-1.5"
                     >
                       <KeyRound className="size-3" /> Mot de passe
+                    </button>
+                    <button
+                      onClick={() => toggleRole(admin)}
+                      disabled={admin.id === currentId}
+                      title={admin.id === currentId ? "Impossible de modifier vos propres droits" : undefined}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all bg-[#e8c26a]/10 text-[#e8c26a] border border-[#e8c26a]/30 hover:bg-[#e8c26a]/20 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {admin.isOwner ? <Crown className="size-3" /> : <UserCog className="size-3" />}
+                      {admin.isOwner ? "Retirer les droits" : "Accès complet"}
+                    </button>
+                    <button
+                      onClick={() => remove(admin)}
+                      disabled={admin.id === currentId}
+                      title={admin.id === currentId ? "Impossible de supprimer votre propre compte" : undefined}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <Trash2 className="size-3" /> Supprimer
                     </button>
                   </div>
                 </div>
