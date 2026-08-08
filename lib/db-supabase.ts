@@ -212,7 +212,14 @@ export async function getWithdrawals(limit = 50): Promise<Withdrawal[]> {
 }
 
 export async function recordWithdrawal(
-  w: { id: string; amount: number; phoneNumber: string; operator: "MTN" | "ORANGE"; reference: string }
+  w: {
+    id: string
+    amount: number
+    phoneNumber: string
+    operator: "MTN" | "ORANGE"
+    reference: string
+    status?: "PENDING" | "SUCCESS" | "FAILED"
+  }
 ): Promise<Withdrawal> {
   const { data, error } = await supabaseAdmin
     .from("withdrawals")
@@ -222,7 +229,7 @@ export async function recordWithdrawal(
       phone_number: w.phoneNumber,
       operator: w.operator,
       reference: w.reference,
-      status: "SUCCESS",
+      status: w.status || "PENDING",
     })
     .select()
     .single()

@@ -40,7 +40,7 @@ const UNSPLASH = (id: string) =>
 const HOW_IT_WORKS: [string, string, string][] = [
   ["01", "Choisis", "Parcours la liste des candidats Roi ou Reine et clique sur celui ou celle de ton choix."],
   ["02", "Paye", "Saisis ton numéro Mobile Money et le nombre de votes. 100 FCFA par vote."],
-  ["03", "Valide", "Confirme la transaction sur ton téléphone (prompt USSD) pour valider tes votes."],
+  ["03", "Valide", "Confirme le paiement sur la page sécurisée CamerPay pour valider tes votes."],
 ]
 
 const VIDEO_SRC = "/hero-bal-masque.mp4"
@@ -110,6 +110,34 @@ export default function Page() {
     const interval = setInterval(fetchCandidates, 8000)
     return () => clearInterval(interval)
   }, [])
+
+  // Resume a pending payment after CamerPay redirects back with ?tx=...
+  useEffect(() => {
+    if (candidates.length === 0) return
+    const params = new URLSearchParams(window.location.search)
+    const tx = params.get("tx")
+    if (!tx) return
+    history.replaceState(null, "", window.location.pathname)
+    setCurrentTxId(tx)
+    fetch(`/api/vote/status?id=${tx}`)
+      .then(safeJson)
+      .then((data) => {
+        if (!data.success) return
+        const cand = candidates.find((c) => c.id === data.candidateId)
+        if (!cand) return
+        setSelectedCandidate(cand)
+        setVoteCount(data.votes || 1)
+        if (data.status === "SUCCESS") {
+          setFlowState("success")
+        } else if (data.status === "PENDING") {
+          setFlowState("pending_ussd")
+        } else {
+          setFlowState("failed")
+          setErrorMessage("Le paiement a été annulé ou a échoué.")
+        }
+      })
+      .catch((err) => console.error("Error resuming payment:", err))
+  }, [candidates])
 
   // Cinematic hero: parallax drift + content soft-fade as you scroll away.
   useEffect(() => {
@@ -225,6 +253,12 @@ export default function Page() {
       if (data.success) {
         setCurrentTxId(data.transactionId)
         setFlowState("pending_ussd")
+        if (data.payUrl) {
+          window.location.href = data.payUrl
+        } else {
+          setFlowState("failed")
+          setErrorMessage("Impossible de démarrer le paiement sécurisé.")
+        }
       } else {
         setFlowState("failed")
         setErrorMessage(data.error || "Impossible d'initier le paiement.")
@@ -899,17 +933,15 @@ export default function Page() {
               {flowState === "pending_ussd" && (
                 <div className="py-8 flex flex-col items-center justify-center text-center">
                   <Smartphone className="animate-bounce text-[#e8c26a] size-16 mb-4" />
-                  <h4 className="text-xl font-bold font-orbitron uppercase text-white mb-2">Confirmation requise</h4>
-                  <p className="text-[#e8c26a] font-bold text-lg mb-4 font-orbitron animate-pulse">
-                    Vérifiez votre téléphone&nbsp;!
-                  </p>
+                  <h4 className="text-xl font-bold font-orbitron uppercase text-white mb-2">Paiement en cours</h4>
                   <p className="text-neutral-300 max-w-sm text-sm leading-relaxed mb-6">
-                    Une invite de paiement (USSD Push) a été envoyée au <strong>{phoneNumber}</strong>.
-                    Saisissez votre code PIN secret sur votre téléphone pour valider le paiement de {voteCount * 100} FCFA.
+                    Vous allez être redirigé vers la page sécurisée <strong>CamerPay</strong> pour confirmer
+                    le paiement de <strong>{voteCount * 100} FCFA</strong>. Après validation, vous reviendrez
+                    automatiquement sur cette page.
                   </p>
                   <div className="flex items-center gap-2 text-xs text-neutral-500 bg-white/5 px-4 py-2 rounded-full border border-white/5">
                     <Loader2 className="animate-spin size-4" />
-                    <span>En attente de la validation bancaire...</span>
+                    <span>En attente de la validation...</span>
                   </div>
                 </div>
               )}

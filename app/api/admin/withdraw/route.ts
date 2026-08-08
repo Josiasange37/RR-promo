@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase"
 import { requireOwner } from "@/lib/admin-auth"
-import { requestDeposit } from "@/lib/campay"
+import { requestDeposit } from "@/lib/camerpay"
 import { getWithdrawals, recordWithdrawal } from "@/lib/db-supabase"
 
 export const dynamic = "force-dynamic"

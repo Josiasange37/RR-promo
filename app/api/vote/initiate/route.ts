@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { getCandidateById, recordTransaction } from "@/lib/db-supabase"
-import { requestCollection } from "@/lib/campay"
+import { requestCollection } from "@/lib/camerpay"
+
+export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
   try {
@@ -26,7 +28,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Opérateur de paiement invalide" }, { status: 400 })
     }
 
-    // CamPay unit vote price is 100 FCFA
+    // Unit vote price is 100 FCFA
     const unitPrice = 100
     const amount = voteCount * unitPrice
 
@@ -43,18 +45,23 @@ export async function POST(request: Request) {
       operator,
     })
 
-    // 4. Request CamPay payment collection
+    // 4. Request the CamerPay hosted payment
+    const origin = new URL(request.url).origin
     console.log(`[API Initiate] Starting payment request for transaction ${txId}`)
     const payResult = await requestCollection({
       amount,
       phoneNumber,
       externalReference: txId,
+      callbackUrl: `${origin}/api/vote/webhook`,
+      returnUrl: `${origin}?tx=${txId}`,
+      operator,
     })
 
     return NextResponse.json({
       success: true,
       transactionId: tx.id,
-      paymentReference: payResult.reference,
+      paymentReference: txId,
+      payUrl: payResult.payUrl,
       amount,
       status: tx.status,
     })

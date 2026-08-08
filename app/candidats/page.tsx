@@ -71,6 +71,29 @@ export default function CandidatsPage() {
     return () => clearInterval(interval)
   }, [fetchCandidates])
 
+  // Resume a pending payment after CamerPay redirects back with ?tx=...
+  useEffect(() => {
+    if (candidates.length === 0) return
+    const params = new URLSearchParams(window.location.search)
+    const tx = params.get("tx")
+    if (!tx) return
+    history.replaceState(null, "", window.location.pathname)
+    setCurrentTxId(tx)
+    fetch(`/api/vote/status?id=${tx}`)
+      .then(safeJson)
+      .then((data) => {
+        if (!data.success) return
+        const cand = candidates.find((c) => c.id === data.candidateId)
+        if (!cand) return
+        setSelectedCandidate(cand)
+        setVoteCount(data.votes || 1)
+        if (data.status === "SUCCESS") setFlowState("success")
+        else if (data.status === "PENDING") setFlowState("pending_ussd")
+        else { setFlowState("failed"); setErrorMessage("Le paiement a été annulé ou a échoué.") }
+      })
+      .catch((err) => console.error("Error resuming payment:", err))
+  }, [candidates, fetchCandidates])
+
   // Poll transaction status
   useEffect(() => {
     if (flowState !== "pending_ussd" || !currentTxId) return
@@ -119,7 +142,16 @@ export default function CandidatsPage() {
         body: JSON.stringify({ candidateId: selectedCandidate.id, votes: voteCount, phoneNumber: cleanedPhone, operator }),
       })
       const data = await safeJson(res)
-      if (data.success) { setCurrentTxId(data.transactionId); setFlowState("pending_ussd") }
+      if (data.success) {
+        setCurrentTxId(data.transactionId)
+        setFlowState("pending_ussd")
+        if (data.payUrl) {
+          window.location.href = data.payUrl
+        } else {
+          setFlowState("failed")
+          setErrorMessage("Impossible de démarrer le paiement sécurisé.")
+        }
+      }
       else { setFlowState("failed"); setErrorMessage(data.error || "Impossible d'initier le paiement.") }
     } catch {
       setFlowState("failed")
@@ -414,9 +446,8 @@ export default function CandidatsPage() {
               {flowState === "pending_ussd" && (
                 <div className="py-8 flex flex-col items-center justify-center text-center">
                   <Smartphone className="animate-bounce text-[#e8c26a] size-16 mb-4" />
-                  <h4 className="text-xl font-bold font-orbitron uppercase text-white mb-2">Confirmation requise</h4>
-                  <p className="text-[#e8c26a] font-bold text-lg mb-4 font-orbitron animate-pulse">Vérifiez votre téléphone&nbsp;!</p>
-                  <p className="text-neutral-300 max-w-sm text-sm leading-relaxed mb-6">Saisissez votre code PIN Mobile Money pour valider le paiement de <strong>{voteCount * 100} FCFA</strong>.</p>
+                  <h4 className="text-xl font-bold font-orbitron uppercase text-white mb-2">Paiement en cours</h4>
+                  <p className="text-neutral-300 max-w-sm text-sm leading-relaxed mb-6">Vous allez être redirigé vers la page sécurisée <strong>CamerPay</strong> pour confirmer le paiement de <strong>{voteCount * 100} FCFA</strong>. Après validation, vous reviendrez automatiquement sur cette page.</p>
                   <div className="flex items-center gap-2 text-xs text-neutral-500 bg-white/5 px-4 py-2 rounded-full border border-white/5">
                     <Loader2 className="animate-spin size-4" />
                     <span>En attente de la validation...</span>

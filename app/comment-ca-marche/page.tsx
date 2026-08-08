@@ -31,7 +31,7 @@ const FAQ = [
   },
   {
     q: "Comment savoir si mon vote a bien été pris en compte ?",
-    a: "Après avoir confirmé la transaction USSD sur votre téléphone, notre système valide le paiement automatiquement. Vous verrez un message de confirmation à l'écran et le compteur de votes du candidat sera mis à jour en temps réel.",
+    a: "Après confirmation du paiement sur la page sécurisée CamerPay, notre système valide la transaction automatiquement. Vous serez redirigé vers cette page avec un message de confirmation et le compteur de votes du candidat sera mis à jour en temps réel.",
   },
   {
     q: "Puis-je voter plusieurs fois pour le même candidat ?",
@@ -43,7 +43,7 @@ const FAQ = [
   },
   {
     q: "Que se passe-t-il si la transaction échoue ?",
-    a: "Si vous annulez le paiement USSD, ou si la transaction échoue pour une raison technique, aucun vote n'est enregistré et aucun montant n'est débité. Vous pouvez réessayer immédiatement sans problème.",
+    a: "Si vous annulez le paiement, ou si la transaction échoue pour une raison technique, aucun vote n'est enregistré et aucun montant n'est débité. Vous pouvez réessayer immédiatement sans problème.",
   },
   {
     q: "Jusqu'à quand peut-on voter ?",
@@ -51,7 +51,7 @@ const FAQ = [
   },
   {
     q: "Mes données personnelles sont-elles sécurisées ?",
-    a: "Votre numéro de téléphone est uniquement utilisé pour initier la transaction Mobile Money. Nous ne stockons aucune donnée bancaire. Les paiements sont traités par CamPay, une passerelle de paiement certifiée.",
+    a: "Votre numéro de téléphone est uniquement utilisé pour initier la transaction Mobile Money. Nous ne stockons aucune donnée bancaire. Les paiements sont traités par CamerPay, une passerelle de paiement camerounaise sécurisée.",
   },
   {
     q: "Comment voir le classement actuel ?",
@@ -350,7 +350,7 @@ export default function CommentCaMarchePage() {
             <StepCard
               number="03"
               title="Confirmez"
-              description="Appuyez sur « Valider le vote ». Un prompt USSD apparaîtra sur votre téléphone. Saisissez votre code PIN secret pour autoriser le paiement Mobile Money."
+              description="Appuyez sur « Valider le vote ». Vous êtes redirigé vers la page sécurisée CamerPay pour confirmer le paiement en toute sécurité (Orange Money ou MTN MoMo)."
               Icon={Lock}
               color="#c084fc"
               delay={200}
