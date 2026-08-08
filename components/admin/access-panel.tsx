@@ -12,6 +12,7 @@ import {
   Copy,
   Crown,
   Smartphone,
+  UserPlus,
 } from "lucide-react"
 import { CornerFrame } from "@/components/ui/motifs"
 
@@ -34,6 +35,7 @@ interface EnrollResult {
 type Modal =
   | { type: "qr"; admin: AdminUser; data: EnrollResult | null; code: string; busy: boolean; error: string | null }
   | { type: "password"; name: string; newPassword: string | null; busy: boolean; error: string | null }
+  | { type: "create"; username: string; label: string; created: { username: string; password: string } | null; busy: boolean; error: string | null }
   | null
 
 export default function AccessPanel() {
@@ -137,6 +139,27 @@ export default function AccessPanel() {
     })()
   }
 
+  const createAdmin = async () => {
+    if (!modal || modal.type !== "create" || !modal.username.trim()) return
+    setModal({ ...modal, busy: true, error: null })
+    try {
+      const res = await fetch("/api/admin/access/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: modal.username.trim(), label: modal.label.trim() || null }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setModal({ ...modal, busy: false, created: { username: data.admin.username, password: data.password } })
+        load()
+      } else {
+        setModal({ ...modal, busy: false, error: data.error ?? "Échec de la création." })
+      }
+    } catch {
+      setModal({ ...modal, busy: false, error: "Erreur réseau." })
+    }
+  }
+
   const copySecret = (secret: string) => {
     try {
       navigator.clipboard?.writeText(secret)
@@ -159,6 +182,15 @@ export default function AccessPanel() {
             </p>
           </div>
           <span className="trx-badge">{admins.length} compte{admins.length > 1 ? "s" : ""}</span>
+        </div>
+
+        <div className="mb-4 flex justify-end">
+          <button
+            onClick={() => setModal({ type: "create", username: "", label: "", created: null, busy: false, error: null })}
+            className="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all bg-[#e8c26a] text-black hover:opacity-90 flex items-center gap-1.5"
+          >
+            <UserPlus className="size-3" /> Nouveau compte
+          </button>
         </div>
 
         {error && (
@@ -317,6 +349,94 @@ export default function AccessPanel() {
           </div>
         </ModalOverlay>
       )}
+
+      {modal && modal.type === "create" && (
+        <ModalOverlay onClose={() => setModal(null)}>
+          <div className="p-6 md:p-8">
+            <div className="h-1.5 w-full bg-[#e8c26a] absolute top-0 left-0 rounded-t-2xl" />
+            {modal.created ? (
+              <>
+                <h3 className="text-xl font-bold font-orbitron uppercase text-white m-0 flex items-center gap-2">
+                  <CheckCircle className="size-5 text-[#e8c26a]" /> Compte créé — {modal.created.username}
+                </h3>
+                <p className="text-xs text-neutral-400 mt-2">
+                  Communiquez ces identifiants à l&apos;administrateur. Le mot de passe ne sera plus jamais affiché.
+                </p>
+                <div className="mt-5">
+                  <div className="text-xs text-neutral-500 uppercase tracking-wider mb-1">Identifiant</div>
+                  <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-4 py-3">
+                    <code className="flex-1 text-sm font-mono font-bold text-white select-all">{modal.created.username}</code>
+                    <button onClick={() => copySecret(modal.created!.username)} className="text-neutral-400 hover:text-white" aria-label="Copier">
+                      <Copy className="size-4" />
+                    </button>
+                  </div>
+                  <div className="text-xs text-neutral-500 uppercase tracking-wider mb-1 mt-4">Mot de passe</div>
+                  <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-4 py-3">
+                    <code className="flex-1 text-sm font-mono font-bold text-[#e8c26a] select-all">{modal.created.password}</code>
+                    <button onClick={() => copySecret(modal.created!.password)} className="text-neutral-400 hover:text-white" aria-label="Copier">
+                      <Copy className="size-4" />
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setModal(null)}
+                  className="mt-6 w-full h-12 rounded-xl bg-[#e8c26a] text-black font-bold uppercase tracking-wider text-sm transition-all hover:opacity-90"
+                >
+                  Terminé
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className="text-xl font-bold font-orbitron uppercase text-white m-0 flex items-center gap-2">
+                  <UserPlus className="size-5 text-[#e8c26a]" /> Nouveau compte administrateur
+                </h3>
+                <p className="text-xs text-neutral-400 mt-2">
+                  Le compte pourra accéder au panneau de modération. Un mot de passe sécurisé sera généré et affiché une seule fois.
+                </p>
+                <div className="mt-5 space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-neutral-300 uppercase tracking-wider block mb-2">Identifiant</label>
+                    <input
+                      type="text"
+                      value={modal.username}
+                      onChange={(e) => setModal({ ...modal, username: e.target.value.replace(/[^a-zA-Z0-9_]/g, "") })}
+                      placeholder="ex. admin_vote"
+                      className="w-full h-12 px-4 bg-black/40 border border-white/10 rounded-xl font-mono text-white outline-none focus:border-[#e8c26a]/40"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-neutral-300 uppercase tracking-wider block mb-2">Libellé (optionnel)</label>
+                    <input
+                      type="text"
+                      value={modal.label}
+                      onChange={(e) => setModal({ ...modal, label: e.target.value.slice(0, 80) })}
+                      placeholder="ex. Équipe du soir"
+                      className="w-full h-12 px-4 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#e8c26a]/40"
+                    />
+                  </div>
+                  {modal.error && <p className="text-red-400 text-xs font-medium">{modal.error}</p>}
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      onClick={() => setModal(null)}
+                      className="flex-1 h-12 rounded-xl bg-white/5 text-neutral-300 font-bold uppercase tracking-wider text-sm border border-white/10 transition-all hover:bg-white/10"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={createAdmin}
+                      disabled={modal.busy || !modal.username.trim()}
+                      className="flex-1 h-12 rounded-xl bg-[#e8c26a] text-black font-bold uppercase tracking-wider text-sm transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
+                    >
+                      {modal.busy ? <Loader2 className="animate-spin size-4" /> : <UserPlus className="size-4" />}
+                      Créer
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </ModalOverlay>
+      )}
     </>
   )
 }
@@ -327,7 +447,7 @@ function ModalOverlay({ children, onClose }: { children: React.ReactNode; onClos
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-[#14141c] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10 max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-md bg-[#14141c] border border-white/10 rounded-2xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
         {children}
       </div>
     </div>
