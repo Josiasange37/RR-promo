@@ -20,9 +20,9 @@ const jakarta = Plus_Jakarta_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "Balle Maskee 2026 — Élection Roi & Reine",
+  title: "Bal Masqué 2026 — Élection Roi & Reine",
   description:
-    "Votez pour élire le Roi et la Reine de la Balle Maskee 2026. 100 FCFA par vote — Mobile Money. Votre voix décide de la couronne.",
+    "Votez pour élire le Roi et la Reine du Bal Masqué 2026. 100 FCFA par vote — Mobile Money. Votre voix décide de la couronne.",
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

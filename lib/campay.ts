@@ -97,7 +97,7 @@ export async function requestCollection(params: {
         amount: String(amount),
         currency: "XAF",
         from: formattedPhone,
-        description: `Vote Balle Maskee - R:${externalReference}`,
+        description: `Vote Bal Masqué - R:${externalReference}`,
         external_reference: externalReference,
       }),
     })
@@ -168,7 +168,7 @@ export async function requestDeposit(params: {
       amount: String(amount),
       to: formattedPhone,
       currency: "XAF",
-      description: `Retrait Balle Maskee - R:${externalReference}`,
+      description: `Retrait Bal Masqué - R:${externalReference}`,
       external_reference: externalReference,
     }),
   })

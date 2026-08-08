@@ -271,7 +271,7 @@ export default function AdminPanel() {
               <Lock size={26} />
             </div>
             <h1 className="text-2xl font-bold font-orbitron tracking-tight uppercase">Administration</h1>
-            <p className="text-xs text-neutral-400 mt-2">Balle Maskee · Édition 2026</p>
+            <p className="text-xs text-neutral-400 mt-2">Bal Masqué · Édition 2026</p>
           </div>
 
           <form onSubmit={handleLogin} className="mt-8 space-y-4">
@@ -352,7 +352,7 @@ export default function AdminPanel() {
         <div>
           <span className="text-xs font-bold text-[#e8c26a] tracking-widest uppercase block mb-1">Espace XYBERCLAN</span>
           <h1 className="text-3xl font-bold font-orbitron tracking-tight uppercase m-0">Tableau de Bord</h1>
-          <p className="text-xs text-neutral-400 mt-1">Balle Maskee · Édition 2026</p>
+          <p className="text-xs text-neutral-400 mt-1">Bal Masqué · Édition 2026</p>
         </div>
 
         <div className="flex flex-wrap gap-3">

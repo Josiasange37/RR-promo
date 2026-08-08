@@ -299,7 +299,7 @@ export default function ClassementPage() {
                           <span className="text-xs text-white/40 font-medium uppercase tracking-widest">Leader {leader.category}</span>
                         </div>
                         <h3 className="text-xl font-bold font-orbitron uppercase tracking-tight text-white m-0 leading-tight">{leader.name}</h3>
-                        <p className="text-xs text-white/40 mt-1">{leader.class} · Balle Maskee 2026</p>
+                        <p className="text-xs text-white/40 mt-1">{leader.class} · Bal Masqué 2026</p>
                         <div className="mt-3 flex items-center gap-2">
                           <span className="text-2xl font-black font-orbitron" style={{ color: leader.category === "Roi" ? "#e8c26a" : "#d04a58" }}><CountUp to={leader.votes} duration={1000} /></span>
                           <span className="text-xs text-white/35 font-medium">voix</span>
@@ -326,8 +326,8 @@ export default function ClassementPage() {
 
             {/* Full ranking tables */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <RankingTable title="Roi de la Balle" color="#e8c26a" Icon={Crown} candidates={roiRankings} onVote={openVoteModal} />
-              <RankingTable title="Reine de la Balle" color="#d04a58" Icon={Gem} candidates={reineRankings} onVote={openVoteModal} />
+              <RankingTable title="Roi du Bal Masqué" color="#e8c26a" Icon={Crown} candidates={roiRankings} onVote={openVoteModal} />
+              <RankingTable title="Reine du Bal Masqué" color="#d04a58" Icon={Gem} candidates={reineRankings} onVote={openVoteModal} />
             </div>
 
             {/* Call to vote */}
@@ -381,7 +381,7 @@ export default function ClassementPage() {
             />
             <div>
               <h4 className="text-xl font-bold font-orbitron uppercase text-white m-0">{selectedCandidate.name}</h4>
-              <p className="text-xs text-white/40 mt-1">{selectedCandidate.category} de la Balle Maskee · {selectedCandidate.class}</p>
+              <p className="text-xs text-white/40 mt-1">{selectedCandidate.category} du Bal Masqué · {selectedCandidate.class}</p>
             </div>
             <p className="text-sm text-white/50 leading-relaxed">Pour voter, accédez à la page des candidats où vous pourrez choisir votre nombre de votes et votre opérateur Mobile Money.</p>
             <div className="flex gap-3 w-full">

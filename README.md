@@ -1,6 +1,6 @@
-# Application de Vote — Balle Maskee 2026
+# Application de Vote — Bal Masqué 2026
 
-Application web mobile-first de vote en ligne pour l'élection du Roi et de la Reine de la Balle Maskee 2026. Conçue par XYBERCLAN.
+Application web mobile-first de vote en ligne pour l'élection du Roi et de la Reine du Bal Masqué 2026. Conçue par XYBERCLAN.
 
 ## Fonctionnalités
 

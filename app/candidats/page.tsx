@@ -155,7 +155,7 @@ export default function CandidatsPage() {
             Tous les <em style={{ color: "#e8c26a", fontStyle: "normal" }}>candidats.</em>
           </h1>
           <p className="text-base text-white/50 max-w-xl leading-relaxed mb-8" data-reveal>
-            Découvrez l&apos;ensemble des candidats au titre de Roi et Reine de la Balle Maskee 2026. Votez pour vos favoris — 100 FCFA par vote via Mobile Money.
+            Découvrez l&apos;ensemble des candidats au titre de Roi et Reine du Bal Masqué 2026. Votez pour vos favoris — 100 FCFA par vote via Mobile Money.
           </p>
 
           {/* Stats bar */}
@@ -261,7 +261,7 @@ export default function CandidatsPage() {
                   {/* Name overlay at bottom */}
                   <div className="absolute bottom-0 left-0 right-0 p-4">
                     <h3 className="text-base font-bold tracking-tight text-white m-0 uppercase font-orbitron leading-tight">{candidate.name}</h3>
-                    <p className="text-xs text-white/50 mt-0.5">{candidate.class} · Balle Maskee 2026</p>
+                    <p className="text-xs text-white/50 mt-0.5">{candidate.class} · Bal Masqué 2026</p>
                   </div>
                 </div>
 
@@ -357,7 +357,7 @@ export default function CandidatsPage() {
                     <div>
                       <span className="text-xs text-neutral-400 uppercase tracking-widest block">Voter pour</span>
                       <h4 className="text-xl font-bold font-orbitron tracking-tight text-white uppercase m-0">{selectedCandidate.name}</h4>
-                      <span className="text-xs text-neutral-400">{selectedCandidate.category} de la Balle Maskee · {selectedCandidate.class}</span>
+                      <span className="text-xs text-neutral-400">{selectedCandidate.category} du Bal Masqué · {selectedCandidate.class}</span>
                     </div>
                   </div>
                   <div className="mt-8">

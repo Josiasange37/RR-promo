@@ -108,7 +108,7 @@ export function SiteNavbar() {
             {/* ── LOGO ── */}
             <Link
               href="/"
-              aria-label="Balle Maskee — retour à l'accueil"
+              aria-label="Bal Masqué — retour à l'accueil"
               className="flex items-center gap-2.5 flex-none group cursor-pointer"
               onClick={() => setMenuOpen(false)}
             >
@@ -118,13 +118,13 @@ export function SiteNavbar() {
                   className="font-black tracking-[0.12em] text-white uppercase leading-none"
                   style={{ fontFamily: "var(--font-orbitron)", fontSize: "0.95rem" }}
                 >
-                  BALLE<em className="text-[#e8c26a] not-italic text-[0.6rem] align-super">˚</em>
+                  BAL<em className="text-[#e8c26a] not-italic text-[0.6rem] align-super">˚</em>
                 </div>
                 <div
                   className="text-white/40 font-medium uppercase tracking-[0.22em] leading-tight"
                   style={{ fontSize: "0.52rem" }}
                 >
-                  Maske
+                  Masqué
                 </div>
               </div>
             </Link>

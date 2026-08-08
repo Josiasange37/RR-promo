@@ -42,7 +42,7 @@ const HOW_IT_WORKS: [string, string, string][] = [
   ["03", "Valide", "Confirme la transaction sur ton téléphone (prompt USSD) pour valider tes votes."],
 ]
 
-const VIDEO_SRC = "/hero-balle-maskee.mp4"
+const VIDEO_SRC = "/hero-bal-masque.mp4"
 
 
 function d(ms: number): React.CSSProperties {
@@ -240,12 +240,12 @@ export default function Page() {
     src: c.imageUrl,
     alt: `Candidat ${c.name}`,
     title: c.name,
-    subtitle: `${c.category} de la Balle Maskee · ${c.class}`,
+    subtitle: `${c.category} du Bal Masqué · ${c.class}`,
     accentColor: c.category === "Roi" ? "#e8c26a" : "#d04a58",
     accentText: c.category === "Roi" ? "#101014" : "#ffffff",
     meta: [
       { label: "Votes cumulés", value: `${c.votes} voix` },
-      { label: "Balle Maskee", value: "2026" },
+      { label: "Bal Masqué", value: "2026" },
     ],
   }))
 
@@ -304,7 +304,7 @@ export default function Page() {
                 <span className="flex items-center gap-1.5">
                   <Star size={16} strokeWidth={1.5} className="sm:w-5 sm:h-5 flex-none" style={{ fill: "#e8c26a", color: "#e8c26a" }} aria-hidden="true" />
                   <span className="font-semibold" style={{ color: "#e8c26a" }}>
-                    Balle Maskee 2026
+                    Bal Masqué 2026
                   </span>
                 </span>
                 <span className="flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.55)" }}>
@@ -329,11 +329,11 @@ export default function Page() {
                   textTransform: "uppercase",
                 }}
               >
-                Élis ton <em style={{ color: "#e8c26a", fontStyle: "normal" }}>Roi &amp; ta Reine</em> de la Balle Maskee.
+                Élis ton <em style={{ color: "#e8c26a", fontStyle: "normal" }}>Roi &amp; ta Reine</em> du Bal Masqué.
               </h1>
 
               <p className="animate-blur-fade-up text-base sm:text-lg md:text-xl mb-6 md:mb-12 max-w-2xl leading-relaxed" style={{ ...d(500), color: "rgba(255,255,255,0.52)" }}>
-                La grande Balle Maskee 2026 approche. Vote pour tes candidats préférés — 100 FCFA par vote via Mobile Money. Chaque paiement validé est comptabilisé instantanément.
+                Le grand Bal Masqué 2026 approche. Vote pour tes candidats préférés — 100 FCFA par vote via Mobile Money. Chaque paiement validé est comptabilisé instantanément.
               </p>
 
               <div className="flex flex-wrap gap-3 sm:gap-4">
@@ -437,7 +437,7 @@ export default function Page() {
                   <div className="mt-4 flex justify-between items-end">
                     <div>
                       <h3 className="text-xl font-bold tracking-tight text-white m-0 uppercase font-orbitron">{candidate.name}</h3>
-                      <p className="text-xs text-neutral-400 mt-1">Balle Maskee · Édition 2026</p>
+                      <p className="text-xs text-neutral-400 mt-1">Bal Masqué · Édition 2026</p>
                     </div>
                     <div className="text-right">
                       <span className="text-xs text-neutral-400 block uppercase">Votes</span>
@@ -520,7 +520,7 @@ export default function Page() {
             <h2>
               Roi &amp; Reine
               <br />
-              <em>de la Balle Maskee.</em>
+              <em>du Bal Masqué.</em>
             </h2>
           </div>
           <div className="mt-14" data-reveal>
@@ -531,7 +531,7 @@ export default function Page() {
               showPagination
               loop
               autoPlay={3500}
-              label="Candidats au trône de la Balle Maskee"
+              label="Candidats au trône du Bal Masqué"
               onVote={(index) => {
                 const candidate = candidates[index]
                 if (candidate) {
@@ -573,7 +573,7 @@ export default function Page() {
           <CornerFrame data-reveal className="category-card p-6 sm:p-8">
             <div className="flex items-center gap-2.5 mb-6">
               <Crown className="text-[#e8c26a] size-6" />
-              <h3 className="text-xl font-orbitron font-bold text-[#e8c26a] m-0">Roi de la Balle</h3>
+              <h3 className="text-xl font-orbitron font-bold text-[#e8c26a] m-0">Roi du Bal Masqué</h3>
             </div>
             <div className="space-y-4">
               {loadingCandidates ? (
@@ -606,7 +606,7 @@ export default function Page() {
           <CornerFrame data-reveal className="category-card p-6 sm:p-8">
             <div className="flex items-center gap-2.5 mb-6">
               <Gem className="text-[#d04a58] size-6" />
-              <h3 className="text-xl font-orbitron font-bold text-[#d04a58] m-0">Reine de la Balle</h3>
+              <h3 className="text-xl font-orbitron font-bold text-[#d04a58] m-0">Reine du Bal Masqué</h3>
             </div>
             <div className="space-y-4">
               {loadingCandidates ? (
@@ -737,7 +737,7 @@ export default function Page() {
                       <span className="text-xs text-neutral-400 uppercase tracking-widest block">Voter pour</span>
                       <h4 className="text-xl font-bold font-orbitron tracking-tight text-white uppercase m-0">{selectedCandidate.name}</h4>
                       <span className="text-xs text-neutral-400">
-                        {selectedCandidate.category === "Roi" ? "Roi" : "Reine"} de la Balle Maskee · {selectedCandidate.class}
+                        {selectedCandidate.category === "Roi" ? "Roi" : "Reine"} du Bal Masqué · {selectedCandidate.class}
                       </span>
                     </div>
                   </div>
