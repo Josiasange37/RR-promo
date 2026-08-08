@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
     const { error: updateError } = await supabaseAdmin
       .from("admins")
-      .update({ totp_enrolled: true, updated_at: new Date().toISOString() })
+      .update({ totp_enrolled: true })
       .eq("id", target.id)
     if (updateError) {
       return NextResponse.json({ success: false, error: "Erreur interne." }, { status: 500 })

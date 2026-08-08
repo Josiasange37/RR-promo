@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     const secret = generateTotpSecret()
     const { error: updateError } = await supabaseAdmin
       .from("admins")
-      .update({ totp_secret: secret, totp_enrolled: false, updated_at: new Date().toISOString() })
+      .update({ totp_secret: secret, totp_enrolled: false })
       .eq("id", target.id)
     if (updateError) {
       return NextResponse.json({ success: false, error: "Erreur interne." }, { status: 500 })
