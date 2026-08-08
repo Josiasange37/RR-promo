@@ -196,6 +196,27 @@ export async function confirmTransaction(
   return rowToTransaction(updatedTx)
 }
 
+/**
+ * Expire abandoned payments: mark as FAILED every transaction still PENDING
+ * and older than `maxAgeMs`. Abandoned hosted-payment collections never receive
+ * a final webhook, so they would otherwise stay PENDING forever.
+ *
+ * Returns the number of transactions that were marked FAILED.
+ */
+export async function expireStalePendingTransactions(maxAgeMs: number): Promise<number> {
+  const cutoff = new Date(Date.now() - maxAgeMs).toISOString()
+
+  const { data, error } = await supabaseAdmin
+    .from("transactions")
+    .update({ status: "FAILED" })
+    .eq("status", "PENDING")
+    .lt("created_at", cutoff)
+    .select("id")
+
+  if (error) throw new Error(`expireStalePendingTransactions: ${error.message}`)
+  return (data ?? []).length
+}
+
 /* ─────────────────────────────────────────────────────────
    Withdrawals (admin payout journal)
 ───────────────────────────────────────────────────────── */

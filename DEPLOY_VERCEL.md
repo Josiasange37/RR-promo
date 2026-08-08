@@ -22,6 +22,7 @@ Pendant la création **ou** après (Project → Settings → Environment Variabl
 | `CAMERPAY_CALLBACK_SECRET` | copier depuis `.env.local` |
 | `CAMERPAY_MODE` | `production` |
 | `CAMERPAY_PUBLIC_URL` | la future URL publique **sans slash final** (ex. `https://mon-bal-2026.vercel.app`) |
+| `PAYMENT_EXPIRY_MINUTES` | *(optionnel)* durée avant qu'un paiement abandonné (`PENDING`) soit marqué `FAILED`. Défaut : `30` |
 
 > ⚠️ `CAMERPAY_PUBLIC_URL` doit être la VRAIE URL finale (= celle qu'utiliseront les électeurs).
 > C'est là que CamerPay envoie le webhook et redirige après paiement.

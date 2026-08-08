@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { getTransactionById } from "@/lib/db-supabase"
+import { expireStalePendingTransactions, getTransactionById } from "@/lib/db-supabase"
+import { PAYMENT_EXPIRY_MS } from "@/lib/payment-expiry"
 
 export const dynamic = "force-dynamic"
 
@@ -11,6 +12,10 @@ export async function GET(request: Request) {
     if (!id) {
       return NextResponse.json({ success: false, error: "ID transaction manquant" }, { status: 400 })
     }
+
+    // Lazily expire any abandoned pending payment before answering, so a stale
+    // poll reports FAILED instead of PENDING forever.
+    await expireStalePendingTransactions(PAYMENT_EXPIRY_MS)
 
     const tx = await getTransactionById(id)
     if (!tx) {
