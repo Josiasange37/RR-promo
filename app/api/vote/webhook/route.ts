@@ -26,8 +26,11 @@ export async function POST(request: Request) {
 
     console.log(`[CamerPay Webhook] Callback for ${invoiceRef} → ${status}`)
 
-    // Verify the HMAC signature (only enforced when a secret is configured)
-    const verified = verifyPaySignature({ uuid, invoice_id: invoiceRef, status, amount }, signature)
+    // Verify the HMAC signature (only enforced when a secret is configured).
+    // Camer sends it both in the body (`signature`) and in the `X-CamerPay-Signature`
+    // header — both are identical, accept either.
+    const signatureToCheck = signature || request.headers.get("x-camerpay-signature")
+    const verified = verifyPaySignature({ uuid, invoice_id: invoiceRef, status, amount }, signatureToCheck)
     if (!verified) {
       console.warn("[CamerPay Webhook] Invalid signature — rejecting")
       return NextResponse.json({ success: false, error: "Invalid signature" }, { status: 401 })
