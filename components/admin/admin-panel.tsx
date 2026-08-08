@@ -321,6 +321,16 @@ export default function AdminPanel() {
               </p>
             </div>
 
+            {loginError && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 text-red-400 text-sm font-medium bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3"
+              >
+                <XCircle className="size-4 mt-0.5 shrink-0" />
+                <span>{loginError}</span>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loginLoading}
