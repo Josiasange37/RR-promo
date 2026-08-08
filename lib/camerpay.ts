@@ -26,7 +26,12 @@ export function isSandbox(): boolean {
 }
 
 async function authHeaders(): Promise<Record<string, string>> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" }
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    // Laravel returns a JSON 401 instead of a 302→/login redirect when this header
+    // is set; without it fetch() follows the redirect and swallows the real status.
+    Accept: "application/json",
+  }
   const token = config.token
   if (token) headers.Authorization = `Bearer ${token}`
   return headers
@@ -91,8 +96,8 @@ export async function requestCollection(params: {
   const data = await res.json().catch(() => ({}))
   if (!res.ok || !data.pay_url) {
     const msg = data.message || data.error || `CamerPay init failed (${res.status})`
-    console.error(msg)
-    throw new Error(msg)
+    console.error("[CamerPay Initiate]", res.status, data)
+    throw new Error(msg + ` [HTTP ${res.status}]`)
   }
 
   return { payUrl: data.pay_url, status: "PENDING" }
