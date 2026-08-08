@@ -24,6 +24,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Nombre de votes invalide" }, { status: 400 })
     }
 
+    // CamerPay caps a single transaction at 1 000 000 XAF (10 000 votes × 100 FCFA).
+    const MAX_VOTES = 10000
+    if (voteCount > MAX_VOTES) {
+      return NextResponse.json(
+        { success: false, error: `Montant maximum de ${MAX_VOTES} votes (1 000 000 FCFA) dépassé` },
+        { status: 400 }
+      )
+    }
+
     if (operator !== "MTN" && operator !== "ORANGE") {
       return NextResponse.json({ success: false, error: "Opérateur de paiement invalide" }, { status: 400 })
     }

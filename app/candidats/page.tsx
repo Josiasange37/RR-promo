@@ -398,8 +398,8 @@ export default function CandidatsPage() {
                     <label className="text-xs font-semibold text-neutral-300 uppercase tracking-wider block mb-3">Nombre de votes</label>
                     <div className="flex items-center gap-3">
                       <button type="button" onClick={() => setVoteCount(Math.max(1, voteCount - 1))} className="w-12 h-12 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl flex items-center justify-center font-bold text-lg select-none transition-all">-</button>
-                      <input type="number" min="1" required value={voteCount} onChange={(e) => setVoteCount(Math.max(1, parseInt(e.target.value) || 1))} className="flex-1 h-12 bg-black/40 border border-white/10 rounded-xl text-center font-bold font-orbitron text-xl text-white outline-none focus:border-white/30" />
-                      <button type="button" onClick={() => setVoteCount(voteCount + 1)} className="w-12 h-12 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl flex items-center justify-center font-bold text-lg select-none transition-all">+</button>
+                      <input type="number" min="1" max="10000" required value={voteCount} onChange={(e) => setVoteCount(Math.min(10000, Math.max(1, parseInt(e.target.value) || 1)))} className="flex-1 h-12 bg-black/40 border border-white/10 rounded-xl text-center font-bold font-orbitron text-xl text-white outline-none focus:border-white/30" />
+                      <button type="button" onClick={() => setVoteCount(Math.min(10000, voteCount + 1))} className="w-12 h-12 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl flex items-center justify-center font-bold text-lg select-none transition-all">+</button>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {[1, 5, 10, 20, 50, 100].map((preset) => (

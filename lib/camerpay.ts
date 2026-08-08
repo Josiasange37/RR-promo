@@ -95,9 +95,14 @@ export async function requestCollection(params: {
 
   const data = await res.json().catch(() => ({}))
   if (!res.ok || !data.pay_url) {
-    const msg = data.message || data.error || `CamerPay init failed (${res.status})`
+    // CamerPay returns validation details under `errors` (422) or `message` (4xx).
+    const detail =
+      data.errors && typeof data.errors === "object"
+        ? JSON.stringify(data.errors)
+        : data.message || data.error || ""
+    const msg = detail || `CamerPay init failed (${res.status})`
     console.error("[CamerPay Initiate]", res.status, data)
-    throw new Error(msg + ` [HTTP ${res.status}]`)
+    throw new Error(`${msg} [HTTP ${res.status}]`)
   }
 
   return { payUrl: data.pay_url, status: "PENDING" }
