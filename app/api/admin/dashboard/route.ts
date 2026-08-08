@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase"
-import { readSessionCookie, verifySessionToken } from "@/lib/admin-auth"
+import { readSessionCookie, verifySessionToken, getSessionAdmin } from "@/lib/admin-auth"
 
 export const dynamic = "force-dynamic"
 
@@ -12,6 +12,7 @@ export async function GET(request: Request) {
     if (!token || !(await verifySessionToken(token))) {
       return NextResponse.json({ success: false, error: "Non autorisé" }, { status: 401 })
     }
+    const currentAdmin = await getSessionAdmin(request)
 
     const { searchParams } = new URL(request.url)
     const offset = Math.max(0, parseInt(searchParams.get("offset") || "0", 10) || 0)
@@ -75,6 +76,9 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       success: true,
+      current: currentAdmin
+        ? { id: currentAdmin.id, username: currentAdmin.username, isOwner: currentAdmin.is_owner }
+        : null,
       stats: { totalCollected, totalVotes, successCount, failedCount, pendingCount, totalTransactions },
       roiRankings,
       reineRankings,

@@ -19,9 +19,11 @@ import {
   EyeOff,
   Wallet,
   ArrowDownUp,
+  Smartphone,
 } from "lucide-react"
 
 import { CornerFrame } from "@/components/ui/motifs"
+import AccessPanel from "@/components/admin/access-panel"
 
 interface CandidateRank {
   id: string
@@ -65,10 +67,12 @@ interface WithdrawalItem {
 export default function AdminPanel() {
   const [username, setUsername] = useState<string>("")
   const [password, setPassword] = useState<string>("")
+  const [totpCode, setTotpCode] = useState<string>("")
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
   const [loginError, setLoginError] = useState<string>("")
   const [loginLoading, setLoginLoading] = useState<boolean>(false)
+  const [currentIsOwner, setCurrentIsOwner] = useState<boolean>(false)
 
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [roiRankings, setRoiRankings] = useState<CandidateRank[]>([])
@@ -95,6 +99,7 @@ export default function AdminPanel() {
       const data = await res.json()
       if (data.success) {
         setIsLoggedIn(true)
+        setCurrentIsOwner(data.current?.isOwner ?? false)
         setStats(data.stats)
         setRoiRankings(data.roiRankings)
         setReineRankings(data.reineRankings)
@@ -154,7 +159,8 @@ export default function AdminPanel() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!username.trim() || !password.trim()) return
+    if (!username.trim()) return
+    if (!password.trim() && !totpCode.trim()) return
     setLoginLoading(true)
     setLoginError("")
 
@@ -162,12 +168,17 @@ export default function AdminPanel() {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username.trim(), password }),
+        body: JSON.stringify({
+          username: username.trim(),
+          password: password || undefined,
+          code: totpCode.trim() || undefined,
+        }),
       })
       const data = await res.json()
       if (data.success) {
         await loadDashboard()
         setPassword("")
+        setTotpCode("")
       } else {
         setLoginError(data.error || "Identifiants incorrects.")
       }
@@ -187,6 +198,7 @@ export default function AdminPanel() {
     setIsLoggedIn(false)
     setUsername("")
     setPassword("")
+    setTotpCode("")
     setStats(null)
   }
 
@@ -325,6 +337,28 @@ export default function AdminPanel() {
                 {loginError}
               </p>
             )}
+
+            <div>
+              <label className="text-xs font-semibold text-neutral-300 uppercase tracking-wider block mb-2">
+                Code de vérification <span className="text-neutral-500 normal-case font-normal">(optionnel si mot de passe)</span>
+              </label>
+              <div className="relative">
+                <Smartphone className="absolute left-4 top-3.5 text-neutral-500 size-4" />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  autoComplete="one-time-code"
+                  placeholder="123456"
+                  value={totpCode}
+                  onChange={(e) => setTotpCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
+                  className="w-full h-12 pl-11 pr-4 bg-black/40 border border-white/10 rounded-xl font-mono font-bold tracking-[0.4em] text-white outline-none focus:border-[#e8c26a]/40 transition-colors"
+                />
+              </div>
+              <p className="text-[10px] text-neutral-500 mt-1.5">
+                Administrateur configuré : saisissez le code à 6 chiffres de l&apos;application. Sinon, renseignez le mot de passe.
+              </p>
+            </div>
 
             <button
               type="submit"
@@ -542,6 +576,9 @@ export default function AdminPanel() {
               </div>
             )}
           </CornerFrame>
+
+          {/* Owner-only: two-factor / authenticator management */}
+          {currentIsOwner && <AccessPanel />}
 
           {/* Rankings progress grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

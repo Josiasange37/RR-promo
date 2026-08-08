@@ -64,7 +64,11 @@ create table if not exists admins (
   username       text not null unique check (username ~ '^[a-zA-Z0-9_]+$'),
   password_hash  text not null,
   label          text,
-  created_at     timestamptz default now()
+  is_owner       boolean not null default false,
+  totp_secret    text,
+  totp_enrolled  boolean not null default false,
+  created_at     timestamptz default now(),
+  updated_at     timestamptz default now()
 );
 
 -- Valid sessions (HttpOnly cookie token)
@@ -101,3 +105,15 @@ alter table withdrawals enable row level security;
 
 -- No SELECT/INSERT/UPDATE policies for public role:
 -- only the service-role client (server side) can touch these tables.
+
+-- ══════════════════════════════════════════════════════════════════
+--  MIGRATION — two-factor (TOTP) for admin accounts (run in SQL console)
+-- ══════════════════════════════════════════════════════════════════
+
+-- Add the two-factor columns if your admins table predates them:
+alter table admins add column if not exists is_owner      boolean not null default false;
+alter table admins add column if not exists totp_secret   text;
+alter table admins add column if not exists totp_enrolled boolean not null default false;
+
+-- Mark existing accounts as owners (able to assign authenticators):
+update admins set is_owner = true where username in ('admin_', 'admin_sp');

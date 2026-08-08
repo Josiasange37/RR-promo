@@ -151,3 +151,55 @@ export async function createSession(adminId: string): Promise<string> {
   if (error) throw new Error(`createSession: ${error.message}`)
   return token
 }
+
+/* ─────────────────────────────────────────────
+   Session → admin resolution & owner gating
+   ───────────────────────────────────────────── */
+
+export interface SessionAdmin {
+  id: string
+  username: string
+  label: string | null
+  is_owner: boolean
+  totp_secret: string | null
+  totp_enrolled: boolean
+}
+
+/** Resolve the admin behind a valid session cookie (or null). */
+export async function getSessionAdmin(request: Request): Promise<SessionAdmin | null> {
+  const token = readSessionCookie(request)
+  if (!token || !(await verifySessionToken(token))) return null
+
+  const { data: session } = await supabaseAdmin
+    .from("admin_sessions")
+    .select("admin_id")
+    .eq("token", token)
+    .single()
+  if (!session) return null
+
+  // Try the extended schema (with 2FA columns) first; fall back gracefully if
+  // the migration hasn't run yet so the panel never hard-fails.
+  const { data: admin } = await supabaseAdmin
+    .from("admins")
+    .select("id, username, label, is_owner, totp_secret, totp_enrolled")
+    .eq("id", session.admin_id)
+    .single()
+  if (admin) {
+    return admin as SessionAdmin
+  }
+
+  const { data: base } = await supabaseAdmin
+    .from("admins")
+    .select("id, username, label")
+    .eq("id", session.admin_id)
+    .single()
+  if (!base) return null
+  return { id: base.id, username: base.username, label: base.label, is_owner: false, totp_secret: null, totp_enrolled: false }
+}
+
+/** Resolve the admin behind the session and require the owner role. */
+export async function requireOwner(request: Request): Promise<SessionAdmin | null> {
+  const admin = await getSessionAdmin(request)
+  if (!admin || !admin.is_owner) return null
+  return admin
+}
