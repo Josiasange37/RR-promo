@@ -7,6 +7,7 @@ import { CountUp } from "@/components/ui/count-up"
 import { motion, AnimatePresence } from "motion/react"
 import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap"
 import { useScrollReveal } from "@/lib/use-scroll-reveal"
+import { safeJson } from "@/lib/safe-json"
 
 export interface Candidate {
   id: string
@@ -165,7 +166,7 @@ export default function ClassementPage() {
     if (showRefresh) setRefreshing(true)
     try {
       const res = await fetch("/api/candidates")
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         setCandidates(data.candidates)
         setLastUpdated(new Date())

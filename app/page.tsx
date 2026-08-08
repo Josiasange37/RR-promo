@@ -24,6 +24,7 @@ import { CountUp } from "@/components/ui/count-up"
 import { motion, AnimatePresence } from "motion/react"
 import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap"
 import { useScrollReveal } from "@/lib/use-scroll-reveal"
+import { safeJson } from "@/lib/safe-json"
 import Link from "next/link"
 
 /* ─────────────────────────────────────────────────────────────────
@@ -92,7 +93,7 @@ export default function Page() {
   const fetchCandidates = async () => {
     try {
       const res = await fetch("/api/candidates")
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         setCandidates(data.candidates)
       }
@@ -152,7 +153,7 @@ export default function Page() {
 
       try {
         const res = await fetch(`/api/vote/status?id=${currentTxId}`)
-        const data = await res.json()
+        const data = await safeJson(res)
         if (data.success) {
           if (data.status === "SUCCESS") {
             setFlowState("success")
@@ -220,7 +221,7 @@ export default function Page() {
         }),
       })
 
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         setCurrentTxId(data.transactionId)
         setFlowState("pending_ussd")

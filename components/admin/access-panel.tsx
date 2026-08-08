@@ -16,6 +16,7 @@ import {
   Trash2,
 } from "lucide-react"
 import { CornerFrame } from "@/components/ui/motifs"
+import { safeJson } from "@/lib/safe-json"
 
 interface AdminUser {
   id: string
@@ -49,7 +50,7 @@ export default function AccessPanel() {
   const load = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/access")
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         setAdmins(data.admins ?? [])
         if (data.current?.id) setCurrentId(data.current.id)
@@ -73,7 +74,7 @@ export default function AccessPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ adminId: admin.id }),
       })
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         setModal((m) => (m?.type === "qr" ? { ...m, data, busy: false } : m))
       } else {
@@ -93,7 +94,7 @@ export default function AccessPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ adminId: modal.admin.id, code: modal.code.trim() }),
       })
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         setModal(null)
         load()
@@ -113,7 +114,7 @@ export default function AccessPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ adminId: admin.id }),
       })
-      const data = await res.json()
+      const data = await safeJson(res)
       alert(data.success ? "Authentificateur désactivé." : (data.error ?? "Échec."))
       if (data.success) load()
     } catch {
@@ -131,7 +132,7 @@ export default function AccessPanel() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ adminId: admin.id }),
         })
-        const data = await res.json()
+        const data = await safeJson(res)
         if (data.success) {
           setModal({ type: "password", name: admin.username, newPassword: data.newPassword, busy: false, error: null })
         } else {
@@ -152,7 +153,7 @@ export default function AccessPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: modal.username.trim(), label: modal.label.trim() || null }),
       })
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         setModal({ ...modal, busy: false, created: { username: data.admin.username, password: data.password } })
         load()
@@ -174,7 +175,7 @@ export default function AccessPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ adminId: admin.id, makeOwner: promote }),
       })
-      const data = await res.json()
+      const data = await safeJson(res)
       alert(data.success ? (promote ? "Droits accordés (accès complet)." : "Droits retirés.") : (data.error ?? "Échec."))
       if (data.success) load()
     } catch {
@@ -190,7 +191,7 @@ export default function AccessPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ adminId: admin.id }),
       })
-      const data = await res.json()
+      const data = await safeJson(res)
       alert(data.success ? `Compte « ${admin.username} » supprimé.` : data.error ?? "Échec.")
       if (data.success) load()
     } catch {

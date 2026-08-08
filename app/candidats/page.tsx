@@ -18,6 +18,7 @@ import { CornerFrame } from "@/components/ui/motifs"
 import { CountUp } from "@/components/ui/count-up"
 import { motion, AnimatePresence } from "motion/react"
 import { useScrollReveal } from "@/lib/use-scroll-reveal"
+import { safeJson } from "@/lib/safe-json"
 
 export interface Candidate {
   id: string
@@ -55,7 +56,7 @@ export default function CandidatsPage() {
   const fetchCandidates = useCallback(async () => {
     try {
       const res = await fetch("/api/candidates")
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) setCandidates(data.candidates)
     } catch (err) {
       console.error("Failed to load candidates:", err)
@@ -84,7 +85,7 @@ export default function CandidatsPage() {
       }
       try {
         const res = await fetch(`/api/vote/status?id=${currentTxId}`)
-        const data = await res.json()
+        const data = await safeJson(res)
         if (data.success) {
           if (data.status === "SUCCESS") { setFlowState("success"); fetchCandidates(); clearInterval(id) }
           else if (data.status === "FAILED") { setFlowState("failed"); setErrorMessage("Transaction annulée ou échouée."); clearInterval(id) }
@@ -117,7 +118,7 @@ export default function CandidatsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ candidateId: selectedCandidate.id, votes: voteCount, phoneNumber: cleanedPhone, operator }),
       })
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) { setCurrentTxId(data.transactionId); setFlowState("pending_ussd") }
       else { setFlowState("failed"); setErrorMessage(data.error || "Impossible d'initier le paiement.") }
     } catch {

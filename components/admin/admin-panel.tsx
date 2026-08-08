@@ -24,6 +24,7 @@ import {
 
 import { CornerFrame } from "@/components/ui/motifs"
 import AccessPanel from "@/components/admin/access-panel"
+import { safeJson } from "@/lib/safe-json"
 
 interface CandidateRank {
   id: string
@@ -96,7 +97,7 @@ export default function AdminPanel() {
   const loadDashboard = useCallback(async (fresh = true) => {
     try {
       const res = await fetch("/api/admin/dashboard")
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         setIsLoggedIn(true)
         setCurrentIsOwner(data.current?.isOwner ?? false)
@@ -112,7 +113,7 @@ export default function AdminPanel() {
 
         // Load payout history
         fetch("/api/admin/withdraw")
-          .then((r) => r.json())
+          .then((r) => safeJson(r))
           .then((wd) => {
             if (wd.success) setWithdrawals(wd.withdrawals ?? [])
           })
@@ -142,7 +143,7 @@ export default function AdminPanel() {
     setLoadingMore(true)
     try {
       const res = await fetch(`/api/admin/dashboard?offset=${transactions.length}`)
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         const more = data.recentTransactions ?? []
         transactionsRef.current = [...transactionsRef.current, ...more]
@@ -174,7 +175,7 @@ export default function AdminPanel() {
           code: totpCode.trim() || undefined,
         }),
       })
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         await loadDashboard()
         setPassword("")
@@ -206,7 +207,7 @@ export default function AdminPanel() {
     if (!confirm("ATTENTION : Réinitialiser TOUS les votes et transactions ? Cette action est irréversible.")) return
     try {
       const res = await fetch("/api/admin/reset", { method: "POST" })
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         alert("Base de données réinitialisée avec succès.")
         loadDashboard()
@@ -240,14 +241,14 @@ export default function AdminPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount, phoneNumber: phone, operator: wdOperator }),
       })
-      const data = await res.json()
+      const data = await safeJson(res)
       if (data.success) {
         setWdMessage({ type: "success", text: `Retrait de ${amount.toLocaleString("fr-FR")} FCFA initié avec succès (${data.reference}).` })
         setWdAmount("")
         setWdPhone("")
         // refresh payout history
         fetch("/api/admin/withdraw")
-          .then((r) => r.json())
+          .then((r) => safeJson(r))
           .then((wd) => { if (wd.success) setWithdrawals(wd.withdrawals ?? []) })
           .catch(() => {})
       } else {
