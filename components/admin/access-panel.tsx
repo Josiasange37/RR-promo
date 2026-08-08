@@ -312,39 +312,45 @@ export default function AccessPanel() {
 
       {modal && modal.type === "qr" && (
         <ModalOverlay onClose={() => setModal(null)}>
-          <div className="p-5 sm:p-6 md:p-8">
+          <div className="flex flex-col">
             <div className="h-1.5 w-full bg-[#e8c26a] absolute top-0 left-0 rounded-t-2xl" />
-            <h3 className="text-xl font-bold font-orbitron uppercase text-white m-0 flex items-center gap-2">
-              <Smartphone className="size-5 text-[#e8c26a]" /> Authentificateur — {modal.admin.username}
-            </h3>
-            <p className="text-xs text-neutral-400 mt-2 max-w-md">
-              Scannez ce QR code avec l&apos;application de l&apos;administrateur (Google Authenticator, Authy, 1Password…).
-            </p>
+            <div className="p-5 sm:p-6 md:p-8 overflow-y-auto overflow-x-hidden">
+              <h3 className="text-xl font-bold font-orbitron uppercase text-white m-0 flex items-center gap-2">
+                <Smartphone className="size-5 text-[#e8c26a]" /> Authentificateur — {modal.admin.username}
+              </h3>
+              <p className="text-xs text-neutral-400 mt-2 max-w-md">
+                Scannez ce QR code avec l&apos;application de l&apos;administrateur (Google Authenticator, Authy, 1Password…).
+              </p>
 
-            {modal.busy ? (
-              <div className="flex flex-col items-center justify-center py-10 gap-3">
-                <Loader2 className="animate-spin text-[#e8c26a] size-8" />
-                <p className="text-neutral-400 text-sm">Génération du secret…</p>
-              </div>
-            ) : modal.error ? (
-              <p className="text-red-400 text-sm text-center py-6 font-medium">{modal.error}</p>
-            ) : modal.data ? (
-              <>
-                <div className="mt-6 flex justify-center">
-                  <img src={modal.data.qrDataUrl} alt="QR code d'enrôlement" className="w-56 h-56 rounded-xl border border-white/10 bg-white p-2" />
+              {modal.busy ? (
+                <div className="flex flex-col items-center justify-center py-10 gap-3">
+                  <Loader2 className="animate-spin text-[#e8c26a] size-8" />
+                  <p className="text-neutral-400 text-sm">Génération du secret…</p>
                 </div>
+              ) : modal.error && !modal.data ? (
+                <p className="text-red-400 text-sm text-center py-6 font-medium">{modal.error}</p>
+              ) : modal.data ? (
+                <>
+                  <div className="mt-6 flex justify-center">
+                    <img src={modal.data.qrDataUrl} alt="QR code d'enrôlement" className="w-48 sm:w-56 h-48 sm:h-56 rounded-xl border border-white/10 bg-white p-2" />
+                  </div>
 
-                <div className="mt-4 text-center text-xs text-neutral-400">
-                  Ou saisissez manuellement la clé dans l&apos;application :
-                </div>
-                <div className="mt-2 flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-4 py-3">
-                  <code className="flex-1 text-xs text-[#e8c26a] font-mono break-all select-all">{modal.data.secret}</code>
-                  <button onClick={() => modal.data && copySecret(modal.data.secret)} className="flex-none text-neutral-400 hover:text-white transition-colors" aria-label="Copier le secret">
-                    <Copy className="size-4" />
-                  </button>
-                </div>
+                  <div className="mt-4 text-center text-xs text-neutral-400">
+                    Ou saisissez manuellement la clé dans l&apos;application :
+                  </div>
+                  <div className="mt-2 flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-3 sm:px-4 py-3">
+                    <code className="flex-1 text-xs text-[#e8c26a] font-mono break-all select-all">{modal.data.secret}</code>
+                    <button onClick={() => modal.data && copySecret(modal.data.secret)} className="flex-none text-neutral-400 hover:text-white transition-colors" aria-label="Copier le secret">
+                      <Copy className="size-4" />
+                    </button>
+                  </div>
+                </>
+              ) : null}
+            </div>
 
-                <div className="mt-6">
+            {/* Always-visible confirmation footer */}
+              {modal.data && !modal.busy && (
+                <div className="px-5 sm:px-6 md:px-8 py-4 border-t border-white/10 bg-black/20">
                   <label className="text-xs font-semibold text-neutral-300 uppercase tracking-wider block mb-2">
                     Code de validation (6 chiffres)
                   </label>
@@ -354,6 +360,7 @@ export default function AccessPanel() {
                       inputMode="numeric"
                       maxLength={6}
                       placeholder="123456"
+                      autoFocus
                       value={modal.code}
                       onChange={(e) => setModal({ ...modal, code: e.target.value.replace(/[^0-9]/g, "").slice(0, 6) })}
                       className="flex-1 h-12 px-4 bg-black/40 border border-white/10 rounded-xl font-mono text-center tracking-[0.5em] text-lg text-white outline-none focus:border-[#e8c26a]/40"
@@ -361,7 +368,7 @@ export default function AccessPanel() {
                     <button
                       onClick={confirmEnroll}
                       disabled={modal.busy || modal.code.trim().length !== 6}
-                      className="px-6 h-12 rounded-xl bg-[#e8c26a] text-black font-bold uppercase tracking-wider text-sm transition-all hover:opacity-90 disabled:opacity-40 flex items-center gap-2"
+                      className="px-6 h-12 rounded-xl bg-[#e8c26a] text-black font-bold uppercase tracking-wider text-sm transition-all hover:opacity-90 disabled:opacity-40 flex items-center gap-2 whitespace-nowrap"
                     >
                       {modal.busy ? <Loader2 className="animate-spin size-4" /> : <CheckCircle className="size-4" />}
                       Activer
@@ -369,8 +376,7 @@ export default function AccessPanel() {
                   </div>
                   {modal.error && <p className="text-red-400 text-xs mt-2 font-medium">{modal.error}</p>}
                 </div>
-              </>
-            ) : null}
+              )}
           </div>
         </ModalOverlay>
       )}
@@ -504,7 +510,7 @@ function ModalOverlay({ children, onClose }: { children: React.ReactNode; onClos
     <div className="fixed inset-0 z-[999] overflow-y-auto">
       <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
       <div className="relative z-10 min-h-full flex items-center justify-center p-4 sm:p-6">
-        <div className="relative w-full max-w-md bg-[#14141c] border border-white/10 rounded-2xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto overflow-x-hidden">
+        <div className="relative w-full max-w-md bg-[#14141c] border border-white/10 rounded-2xl shadow-2xl z-10 flex flex-col max-h-[90vh]">
           {children}
         </div>
       </div>
